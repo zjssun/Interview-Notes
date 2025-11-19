@@ -1,4 +1,4 @@
-## dokcer启动kafka
+#### dokcer启动kafka
 ```linux
 docker run -d --name kafka `
   -p 9092:9092 `
@@ -12,4 +12,8 @@ docker run -d --name kafka `
   -e KAFKA_CONTROLLER_QUORUM_VOTERS="1@localhost:9093" `
   -e KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER `
   apache/kafka:4.1.1
+```
+#### 创建 Topic
+```linux
+docker exec kafka /opt/kafka/bin/kafka-topics.sh --create --topic test-topic --partitions 1 --replication-factor 1 --bootstrap-server localhost:9092
 ```
