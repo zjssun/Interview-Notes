@@ -40,9 +40,6 @@ WMHfX7bXRluXXotbmylxmQ
 #### docker-compose.yml
 ```yml
 version: '3.8'
-
-  
-
 services:
   kafka1:
     image: apache/kafka:4.1.1
@@ -91,4 +88,12 @@ services:
       CLUSTER_ID: WMHfX7bXRluXXotbmylxmQ
     ports:
       - "19094:9092"
+```
+#### 启动集群
+```bash
+docker compose up -d
+```
+#### 测试集群
+```bash
+docker exec -it kafka1 bash -c "/opt/kafka/bin/kafka-topics.sh --create --topic test --bootstrap-server kafka1:9092 --partitions 3 --replication-factor 3"
 ```
