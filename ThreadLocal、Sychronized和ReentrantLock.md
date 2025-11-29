@@ -26,7 +26,6 @@
 所以，我们在使用 `ThreadLocal` 时，标准范式是在 `try-finally` 代码块的 `finally` 中，**显式调用 `remove()` 方法**。这不仅是为了清理数据，更是为了切断 Value 的引用链，防止内存泄漏和线程复用导致的数据脏读。
 ### 应用场景
 ##### 保存线程上下文信息（代替参数传递）
-通过 `ThreadLocal`，将用户信息存储在线程中，实现了层与层之间的**零侵入**数据共享。</br>
 ✨下面的代码模拟了一个 **Controller -> Service -> DAO** 的三层架构调用。请注意观察中间的 **Service 层**，它的方法参数里**完全没有**用户信息，实现了参数解耦。</br>
  **代码结构**
 1. **`UserContext`**：基于 ThreadLocal 的上下文容器。
@@ -128,4 +127,4 @@ public class ContextDemo {
     }
 }
 ```
-![](assets/ThreadLocal、Sychronized和ReentrantLock/file-20251130004841609.png)
+![](assets/ThreadLocal、Sychronized和ReentrantLock/file-20251130004841609.png)通过 `ThreadLocal`，将用户信息存储在线程中，实现了层与层之间的**零侵入**数据共享。</br>
