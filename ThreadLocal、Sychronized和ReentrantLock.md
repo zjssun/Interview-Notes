@@ -26,3 +26,97 @@
 所以，我们在使用 `ThreadLocal` 时，标准范式是在 `try-finally` 代码块的 `finally` 中，**显式调用 `remove()` 方法**。这不仅是为了清理数据，更是为了切断 Value 的引用链，防止内存泄漏和线程复用导致的数据脏读。
 ### 应用场景
 ##### 保存线程上下文信息（代替参数传递）
+通过 `ThreadLocal`，将用户信息存储在线程中，实现了层与层之间的**零侵入**数据共享。
+下面的代码模拟了一个 **Controller -> Service -> DAO** 的三层架构调用。请注意观察中间的 **Service 层**，它的方法参数里**完全没有**用户信息，实现了参数解耦。
+```java
+// ==========================================
+// 1. 上下文容器 (工具类)
+// ==========================================
+class UserContext {
+    private static final ThreadLocal<String> userHolder = new ThreadLocal<>();
+
+    public static void setUser(String user) {
+        userHolder.set(user);
+    }
+
+    public static String getUser() {
+        return userHolder.get();
+    }
+
+    public static void remove() {
+        userHolder.remove();
+    }
+}
+
+// ==========================================
+// 2. DAO 层 (最底层，需要用到用户信息)
+// ==========================================
+class AccountDao {
+    public void insertLog(String action) {
+        // 【关键点】：这里不需要上层传参，直接从当前线程抓取是谁在操作
+        String currentUser = UserContext.getUser();
+        
+        System.out.println("   └── [DAO层] 正在记录数据库日志...");
+        System.out.println("       User: [" + currentUser + "] 执行了操作: " + action);
+    }
+}
+
+// ==========================================
+// 3. Service 层 (中间层，无需透传参数)
+// ==========================================
+class AccountService {
+    private AccountDao accountDao = new AccountDao();
+
+    public void transferMoney() {
+        System.out.println("   ├── [Service层] 正在处理转账业务逻辑...");
+        
+        // 注意：这里调用 DAO 时，不需要手动把 user 传进去
+        // 如果没有 ThreadLocal，这里的方法签名通常是：insertLog(user, "转账")
+        accountDao.insertLog("转账 1000 元");
+    }
+}
+
+// ==========================================
+// 4. Controller 层 (入口，负责设置和清理)
+// ==========================================
+class AccountController {
+    private AccountService accountService = new AccountService();
+
+    public void processRequest(String userName) {
+        System.out.println("Step 1: [Controller] 收到请求，用户是: " + userName);
+
+        try {
+            // 1. 在入口处，把用户信息“挂”到当前线程上
+            UserContext.setUser(userName);
+
+            // 2. 调用下游业务
+            // 【对比】：如果没有 ThreadLocal，这里必须写成 accountService.transferMoney(userName)
+            accountService.transferMoney(); 
+
+        } finally {
+            // 3. 【务必清理】 防止内存泄漏和线程复用污染
+            UserContext.remove();
+            System.out.println("Step 4: [Controller] 请求结束，清理上下文\n");
+        }
+    }
+}
+
+// ==========================================
+// 5. 测试主程序
+// ==========================================
+public class ContextDemo {
+    public static void main(String[] args) {
+        AccountController controller = new AccountController();
+
+        // 模拟请求 1：张三
+        new Thread(() -> {
+            controller.processRequest("张三");
+        }).start();
+
+        // 模拟请求 2：李四
+        new Thread(() -> {
+            controller.processRequest("李四");
+        }).start();
+    }
+}
+```
