@@ -127,7 +127,21 @@ public class ContextDemo {
     }
 }
 ```
-![](assets/ThreadLocal、Sychronized和ReentrantLock/file-20251130004841609.png)通过 `ThreadLocal`，将用户信息存储在线程中，实现了层与层之间的**零侵入**数据共享。</br>
+![](assets/ThreadLocal、Sychronized和ReentrantLock/file-20251130004841609.png)通过 `ThreadLocal`，将用户信息存储在线程中，实现了层与层之间的**零侵入**数据共享。
 
 #### 保证对象/资源的线程安全（资源隔离）
+##### 场景：数据库连接 (Connection)
+**问题背景：** 假设你在一个 Service 方法里调用了 3 个 DAO 方法（插入A，更新B，删除C）。 为了让这 3 个操作在**同一个事务**里（要么全成功，要么全回滚），它们必须使用**同一个数据库连接 (Connection)**。</br>
+**ThreadLocal 如何解决：**
 
+1. **开启事务时**：Spring 获取一个数据库连接 `conn1`，然后调用 `ThreadLocal.set(conn1)`，把它绑在当前线程上。
+    
+2. **执行 DAO A**：DAO 问 `ThreadLocal` 要连接，拿到了 `conn1`。
+    
+3. **执行 DAO B**：DAO 问 `ThreadLocal` 要连接，还是拿到了 `conn1`。
+    
+4. **提交事务时**：Spring 从 `ThreadLocal` 取出 `conn1`，执行 `conn1.commit()`。
+    
+5. **结束**：`ThreadLocal.remove()`。
+   
+**如果不用 ThreadLocal**，你就得把 `Connection` 对象作为参数，在 Service 和 DAO 的所有方法之间传来传去，代码会极其难看。
