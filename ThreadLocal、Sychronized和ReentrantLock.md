@@ -128,3 +128,4 @@ public class ContextDemo {
     }
 }
 ```
+![](assets/ThreadLocal、Sychronized和ReentrantLock/file-20251130004841609.png)
