@@ -135,13 +135,10 @@ public class ContextDemo {
 **ThreadLocal 如何解决：**
 
 1. **开启事务时**：Spring 获取一个数据库连接 `conn1`，然后调用 `ThreadLocal.set(conn1)`，把它绑在当前线程上。
-    
 2. **执行 DAO A**：DAO 问 `ThreadLocal` 要连接，拿到了 `conn1`。
-    
 3. **执行 DAO B**：DAO 问 `ThreadLocal` 要连接，还是拿到了 `conn1`。
-    
-4. **提交事务时**：Spring 从 `ThreadLocal` 取出 `conn1`，执行 `conn1.commit()`。
-    
-5. **结束**：`ThreadLocal.remove()`。
+4. **执行 DAO C**：DAO 问 `ThreadLocal` 要连接，还是拿到了 `conn1`。
+5. **提交事务时**：Spring 从 `ThreadLocal` 取出 `conn1`，执行 `conn1.commit()`。
+6. **结束**：`ThreadLocal.remove()`。
    
 **如果不用 ThreadLocal**，你就得把 `Connection` 对象作为参数，在 Service 和 DAO 的所有方法之间传来传去，代码会极其难看。
