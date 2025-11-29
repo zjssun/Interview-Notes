@@ -11,7 +11,7 @@
 - 当我们调用 `set()` 时，其实是把数据存到了**当前线程**的 `threadLocals` 那个 Map 里
 #### 映射关系与冲突解决
 在 `ThreadLocalMap` 中：
-- **Key**：是当前的 `ThreadLocal` 对象实例（即 `this`）。
+- **Key**：是当前的 `ThreadLocal` 对象实例。
     
 - **Value**：是我们想要保存的业务数据。
 
