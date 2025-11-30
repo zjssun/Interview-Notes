@@ -146,3 +146,5 @@ public class ContextDemo {
 ---
 ## Sychronized
 
+`synchronized` 是 Java 中最基础的**并发控制关键字**。
+它是一把“锁”，用来控制多个线程对共享资源的访问，保证同一时刻只能有一个线程来执行特定的代码段。
