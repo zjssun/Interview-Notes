@@ -143,4 +143,6 @@ public class ContextDemo {
 
 **如果不用 ThreadLocal**，你就得把 `Connection` 对象作为参数，在 Service 和 DAO 的所有方法之间传来传去，代码会极其难看。
 
+---
 ## Sychronized
+
