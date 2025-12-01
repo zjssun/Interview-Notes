@@ -280,3 +280,28 @@ try {
     lock.unlock(); 
 }
 ```
+### ReentrantLock 比 synchronized 的核心区别
+#### ① 等待可中断 (`lockInterruptibly`)
+
+- **`synchronized`**：一旦去抢锁，要么抢到，要么一直等。如果别人一直不释放，你只能一直等，**连线程中断（interrupt）都打断不掉你**。
+    
+- **`ReentrantLock`**：可以使用 `lock.lockInterruptibly()`。如果你等得不耐烦了，别人可以调用 `thread.interrupt()` 打断你的等待，让你抛出异常去干别的事。
+    
+
+#### ② 可实现“公平锁” (`Fair Sync`)
+
+- **`synchronized`**：默认是**非公平**的。锁释放了，大家一拥而上抢，谁运气好谁拿到（插队现象严重）。
+    
+- **`ReentrantLock`**：默认也是非公平的（性能好），但你可以强制开启**公平模式**。
+```java
+if (lock.tryLock(2, TimeUnit.SECONDS)) {
+    try {
+        // 拿到锁了，干活
+    } finally {
+        lock.unlock();
+    }
+} else {
+    // 没拿到锁，做降级处理（比如记录日志、以后再试）
+    System.out.println("太忙了，我溜了");
+}
+```
