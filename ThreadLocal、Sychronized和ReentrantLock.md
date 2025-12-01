@@ -263,3 +263,20 @@ public void add() {
 **ReentrantLock**（可重入锁）是 一种**显式锁**。
 如果把 `synchronized` 比作**“自动挡汽车”**（简单、省心、由 JVM 自动控制），那么 `ReentrantLock` 就是**“手动挡汽车”**（功能强大、灵活、需要手动挂挡/摘挡）。
 
+### 核心特点：手动控制
+与 `synchronized` 不同，`ReentrantLock` 需要你**手动**调用方法来加锁和释放锁。
+```java
+// 1. 创建锁对象
+Lock lock = new ReentrantLock();
+
+// 2. 加锁
+lock.lock(); 
+try {
+    // === 业务逻辑 ===
+    System.out.println("我拿到锁了！");
+} finally {
+    // 3. 【必须】在 finally 中解锁
+    // 如果不在 finally 解锁，一旦业务代码抛异常，锁永远不会释放，导致死锁
+    lock.unlock(); 
+}
+```
