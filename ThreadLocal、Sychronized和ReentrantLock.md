@@ -294,6 +294,21 @@ try {
     
 - **`ReentrantLock`**：默认也是非公平的（性能好），但你可以强制开启**公平模式**。
 ```java
+// true 表示开启公平锁：严格按照“先来后到”排队，绝对不允许插队
+Lock lock = new ReentrantLock(true);
+```
+#### ③ 尝试非阻塞获取锁 (`tryLock`)
+
+这是最骚的操作。
+
+- **`synchronized`**：不管有没有锁，头铁往里冲，没锁就阻塞。
+    
+- **`ReentrantLock`**：可以使用 `tryLock()`。
+    
+    - **“有人占着坑吗？有的话我就走了，不排队了。”**
+        
+    - 或者：**“我等你 2 秒，2 秒不开门我就走了。”**
+```java
 if (lock.tryLock(2, TimeUnit.SECONDS)) {
     try {
         // 拿到锁了，干活
@@ -305,3 +320,19 @@ if (lock.tryLock(2, TimeUnit.SECONDS)) {
     System.out.println("太忙了，我溜了");
 }
 ```
+### 底层原理：AQS + CAS
+`ReentrantLock` 的底层完全是基于 **AQS (AbstractQueuedSynchronizer)** 框架实现的。
+
+- **State 变量**：AQS 内部有一个 `volatile int state`。
+    
+    - `state = 0`：表示锁是自由的。
+        
+    - `state > 0`：表示锁被占用了（数值表示重入次数）。
+        
+- **加锁过程**：
+    
+    1. 线程尝试用 **CAS** 把 `state` 从 0 改成 1。
+        
+    2. 如果成功：记录当前线程是锁的持有者（ExclusiveOwnerThread）。
+        
+    3. 如果失败：说明锁被占了。放入 AQS 的**等待队列**中（park 挂起），等待被唤醒。
