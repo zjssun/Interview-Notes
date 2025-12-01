@@ -337,13 +337,13 @@ if (lock.tryLock(2, TimeUnit.SECONDS)) {
         
     3. 如果失败：说明锁被占了。放入 AQS 的**等待队列**中（park 挂起），等待被唤醒。
 ### synchronized和ReentrantLock的区别
-|**特性**|**synchronized**|**ReentrantLock**|
-|---|---|---|
-|**用法**|关键字，JVM 自动管理加锁解锁|类，必须手动 lock/unlock|
-|**灵活性**|低，死等|高，可中断、可超时、可尝试|
-|**公平性**|只能非公平|可选 公平/非公平|
-|**实现机制**|Mark Word (对象头) + Monitor|AQS + CAS|
-|**条件队列**|只有一个 (wait/notify)|可以有多个 (Condition)|
+| **特性**   | **synchronized**          | **ReentrantLock**  |
+| -------- | ------------------------- | ------------------ |
+| **用法**   | 关键字，JVM 自动管理加锁解锁          | 类，必须手动 lock/unlock |
+| **灵活性**  | 低，死等                      | 高，可中断、可超时、可尝试      |
+| **公平性**  | 只能非公平                     | 可选 公平/非公平          |
+| **实现机制** | Mark Word (对象头) + Monitor | AQS + CAS          |
+| **条件队列** | 只有一个 (wait/notify)        | 可以有多个 (Condition)  |
 #### 最佳实践建议：
 
 - **首选 `synchronized`**：在 JDK 1.6 之后，它的性能已经非常好了，而且代码简洁，不用担心忘记释放锁导致死锁。
