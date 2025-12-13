@@ -23,3 +23,5 @@
 - **主键 (Primary Key):** `user_id`
     
 - **唯一索引 (Unique Index):** `idx_key_email` (字段: `email`, 算法: BTREE)
+### 验证码
+**思路**：使用 [EasyCaptcha](https://mvnrepository.com/artifact/com.github.whvcse/easy-captcha/1.6.2)这个库生成验证码，
