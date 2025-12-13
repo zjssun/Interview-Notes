@@ -2,6 +2,7 @@
 ⚒️技术栈：SpringBoot、Mysql、Redis、Rabbitmq、netty
 🧠架构图：
 ![](assets/SnapMeet(仿腾讯会议)----SpringBoot后端开发记录/file-20251201215200120.png)
+# 登录注册
 ## 数据库
 ### 表名：user_info (用户信息表)
 
