@@ -2,6 +2,37 @@
 ⚒️技术栈：SpringBoot、Mysql、Redis、Rabbitmq、netty
 🧠架构图：
 ![](assets/SnapMeet(仿腾讯会议)----SpringBoot后端开发记录/file-20251201215200120.png)
+# 工具类
+
+## Redis 读写规则配置类
+**核心作用是：**防止存入 Redis 的数据变成“乱码”，让数据在 Redis 客户端中看起来是清晰可读的 普通字符串和JSON 格式。
+```java
+@Configuration  
+public class RedisConfig<V> {  
+    @Bean("redisTemplate")  
+    public RedisTemplate<String, V> redisTemplate(RedisConnectionFactory factory){  
+        RedisTemplate<String, V> template = new RedisTemplate<>();  
+        template.setConnectionFactory(factory);  
+        //设置key的序列化方式  
+        template.setKeySerializer(RedisSerializer.string());  
+        //设置value的序列化方式  
+        template.setValueSerializer(RedisSerializer.json());  
+        //设置hash的key的序列化方式  
+        template.setHashKeySerializer(RedisSerializer.string());  
+        //设置hash的key的序列化方式  
+        template.setHashValueSerializer(RedisSerializer.json());  
+        template.afterPropertiesSet();  
+        return template;  
+    }  
+}
+```
+配置和不配置所保存内容的区别：
+
+| **场景** | **存入 Redis 后的 Key**             | **存入 Redis 后的 Value**           | **评价**                   |
+| ------ | ------------------------------- | ------------------------------- | ------------------------ |
+| 不配置    | `\xAC\xED\x00\x05t\x00\x04user` | `\xAC\xED\x00\x05sr\x00\x0E...` | **完全看不懂**，调试极其痛苦，且数据体积大。 |
+| 配置     | `"user"`                        | `{"name": "admin", "age": 18}`  | **清晰明了**，方便维护。           |
+
 # 登录注册
 ## 数据库
 ### 表名：user_info (用户信息表)
