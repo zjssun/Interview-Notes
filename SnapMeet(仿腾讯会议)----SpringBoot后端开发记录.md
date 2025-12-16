@@ -187,13 +187,41 @@ public V rpop(String key) {
     }  
 }
 ```
+**`lpushAll`** ：批量入队，由于是 `Left Push`（从左边/头部塞入），**Redis 里的顺序会和 Java List 的顺序相反（栈结构特性）**。
+```java
+public boolean lpushAll(String key, List<V> values, long time) {  
+    try {  
+        redisTemplate.opsForList().leftPushAll(key, values);  
+        if (time > 0) {  
+            expire(key, time);  
+        }  
+        return true;  
+    } catch (Exception e) {  
+        e.printStackTrace();  
+        return false;  
+    }  
+}
+```
+
 **`getQueueList`**: 获取 List 里所有的元素（`0` 到 `-1` 代表全部）。
 ```java
 public List<V> getQueueList(String key) {  
     return redisTemplate.opsForList().range(key, 0, -1);  
 }
 ```
-
+`remove` ：从列表的 **左边（头部）** 开始找，删除 **1** 个等于 `value` 的元素。
+ - 如果需要改为从**右边(尾部)** 把`opsForList().remove()`参数里的1改为-1。改为0时，则是删除列表中 **所有** 等于 `value` 的元素
+```java
+public long remove(String key, Object value) {  
+    try {  
+        Long remove = redisTemplate.opsForList().remove(key, 1, value);  
+        return remove;  
+    } catch (Exception e) {  
+        e.printStackTrace();  
+        return 0;  
+    }  
+}
+```
 ### 5.高级操作(批量获取与排行榜)
 **`getByKeyPrefix(String keyPrifix)`**:
 
