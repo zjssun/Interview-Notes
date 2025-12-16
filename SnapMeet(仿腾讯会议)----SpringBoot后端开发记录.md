@@ -175,6 +175,18 @@ public boolean lpush(String key, V value, Long time) {
     }  
 }
 ```
+**`rpop` (Right Pop)**: 从右边（尾部）取出数据。
+ - **组合效果**：`lpush` + `rpop` = **FIFO 队列（先进先出）**，就像排队买票。
+```java
+public V rpop(String key) {  
+    try {  
+        return redisTemplate.opsForList().rightPop(key);  
+    } catch (Exception e) {  
+        e.printStackTrace();  
+        return null;  
+    }  
+}
+```
 
 # 登录注册
 ## 数据库
