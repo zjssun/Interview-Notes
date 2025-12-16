@@ -59,6 +59,30 @@ public V get(String key) {
     return key == null ? null : redisTemplate.opsForValue().get(key);  
 }
 ```
+**`expire(String key, long time)`**:
+- 设置过期时间,存入时间为毫秒。
+
+```java
+public boolean expire(String key, long time) {  
+    try {  
+        if (time > 0) {  
+            redisTemplate.expire(key, time, TimeUnit.MILLISECONDS);  
+        }  
+        return true;  
+    } catch (Exception e) {  
+        e.printStackTrace();  
+        return false;  
+    }  
+}
+```
+### String 类型操作
+对应 Redis 的 String 结构（Key-Value）。
+**`get(String key)`**: 获取值，做了空指针保护。
+```java
+public V get(String key) {  
+    return key == null ? null : redisTemplate.opsForValue().get(key);  
+}
+```
 
 # 登录注册
 ## 数据库
