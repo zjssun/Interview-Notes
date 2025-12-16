@@ -54,6 +54,11 @@ public void delete(String... key) {
 **`keyExists(String key)`**:
 
 - 判断 Redis 中是否有这个 Key。
+```java
+public V get(String key) {  
+    return key == null ? null : redisTemplate.opsForValue().get(key);  
+}
+```
 # 登录注册
 ## 数据库
 ### 表名：user_info (用户信息表)
