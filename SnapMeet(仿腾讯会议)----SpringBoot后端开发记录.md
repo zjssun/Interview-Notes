@@ -116,6 +116,14 @@ public boolean setex(String key, V value, long time) {
 }
 ```
 ### 4. 计数器逻辑（原子性操作）
+这部分利用了 Redis 的原子递增特性，常用于**限流、点赞、库存扣减**。
+**`increment(String key)`**: 简单的 +1。
+```java
+public Long increment(String key) {  
+    Long count = redisTemplate.opsForValue().increment(key, 1);  
+    return count;  
+}
+```
 
 # 登录注册
 ## 数据库
