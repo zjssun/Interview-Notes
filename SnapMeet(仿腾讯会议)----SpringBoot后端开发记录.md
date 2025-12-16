@@ -33,6 +33,8 @@ public class RedisConfig<V> {
 | 不配置    | `\xAC\xED\x00\x05t\x00\x04user` | `\xAC\xED\x00\x05sr\x00\x0E...` | **完全看不懂**，调试极其痛苦，且数据体积大。 |
 | 配置     | `"user"`                        | `{"name": "admin", "age": 18}`  | **清晰明了**，方便维护。           |
 ## Redis 工具类
+将 Spring 提供的原生 `RedisTemplate` 操作进行二次封装，简化代码，让我们在写业务逻辑时，不需要每次都处理异常、序列化或复杂的 API 调用。
+
 
 # 登录注册
 ## 数据库
