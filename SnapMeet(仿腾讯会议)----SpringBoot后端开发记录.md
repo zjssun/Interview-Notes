@@ -34,6 +34,7 @@ public class RedisConfig<V> {
 | 配置     | `"user"`                        | `{"name": "admin", "age": 18}`  | **清晰明了**，方便维护。           |
 ## Redis 工具类
 将 Spring 提供的原生 `RedisTemplate` 操作进行二次封装，简化代码，让我们在写业务逻辑时，不需要每次都处理异常、序列化或复杂的 API 调用。
+### 1.通用管理（增删查、过期）
 
 
 # 登录注册
