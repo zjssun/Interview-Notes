@@ -75,8 +75,9 @@ public boolean expire(String key, long time) {
     }  
 }
 ```
-### String 类型操作
-对应 Redis 的 String 结构（Key-Value）。
+### 2.String 类型操作
+> 对应 Redis 的 String 结构（Key-Value）。
+
 **`get(String key)`**: 获取值，做了空指针保护。
 ```java
 public V get(String key) {  
@@ -115,8 +116,9 @@ public boolean setex(String key, V value, long time) {
     }  
 }
 ```
-### 4. 计数器逻辑（原子性操作）
-这部分利用了 Redis 的原子递增特性，常用于**限流、点赞、库存扣减**。
+### 3. 计数器逻辑（原子性操作）
+> 这部分利用了 Redis 的原子递增特性，常用于**限流、点赞、库存扣减**。
+
 **`increment(String key)`**: 简单的 +1。
 ```java
 public Long increment(String key) {  
@@ -152,6 +154,25 @@ public Long decrement(String key) {
     }  
     logger.info("key:{},减少数量{}", key, count);  
     return count;  
+}
+```
+### 4.List 类型操作（队列/栈）
+> 对应 Redis 的 List 结构。
+
+**`lpush` (Left Push)**: 从左边（头部）塞入数据。
+
+```java
+public boolean lpush(String key, V value, Long time) {  
+    try {  
+        redisTemplate.opsForList().leftPush(key, value);  
+        if (time != null && time > 0) {  
+            expire(key, time);  
+        }  
+        return true;  
+    } catch (Exception e) {  
+        e.printStackTrace();  
+        return false;  
+    }  
 }
 ```
 
