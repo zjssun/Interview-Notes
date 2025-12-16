@@ -101,8 +101,21 @@ public boolean set(String key, V value) {
     
 - 逻辑：如果时间 `>0`，设置过期（毫秒）；如果不设置时间，就调用普通 `set`（永久保存）。
 ```java
-
+public boolean setex(String key, V value, long time) {  
+    try {  
+        if (time > 0) {  
+            redisTemplate.opsForValue().set(key, value, time, TimeUnit.MILLISECONDS);  
+        } else {  
+            set(key, value);  
+        }  
+        return true;  
+    } catch (Exception e) {  
+        logger.error("设置redisKey:{},value:{}失败", key, value);  
+        return false;  
+    }  
+}
 ```
+
 # 登录注册
 ## 数据库
 ### 表名：user_info (用户信息表)
