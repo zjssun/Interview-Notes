@@ -35,8 +35,25 @@ public class RedisConfig<V> {
 ## Redis 工具类
 将 Spring 提供的原生 `RedisTemplate` 操作进行二次封装，简化代码，让我们在写业务逻辑时，不需要每次都处理异常、序列化或复杂的 API 调用。
 ### 1.通用管理（增删查、过期）
+**`delete(String... key)`**:
 
+- **智能删除**：支持删除单个 key，也支持一次性删除多个 key（变长参数）。
+    
+- **实现细节**：如果是一个，直接删；如果是多个，转成 `List` 批量删。
+```java
+public void delete(String... key) {  
+    if (key != null && key.length > 0) {  
+        if (key.length == 1) {  
+            redisTemplate.delete(key[0]);  
+        } else {  
+            redisTemplate.delete((Collection<String>) CollectionUtils.arrayToList(key));  
+        }  
+    }  
+}
+```
+**`keyExists(String key)`**:
 
+- 判断 Redis 中是否有这个 Key。
 # 登录注册
 ## 数据库
 ### 表名：user_info (用户信息表)
