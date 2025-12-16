@@ -83,7 +83,26 @@ public V get(String key) {
     return key == null ? null : redisTemplate.opsForValue().get(key);  
 }
 ```
+**`set(String key, V value)`**: 存入值。内部加了 `try-catch`，如果 Redis 挂了，不会导致整个程序崩溃，而是打印错误日志并返回 `false`。
+```java
+public boolean set(String key, V value) {  
+    try {  
+        redisTemplate.opsForValue().set(key, value);  
+        return true;  
+    } catch (Exception e) {  
+        logger.error("设置redisKey:{},value:{}失败", key, value);  
+        return false;  
+    }  
+}
+```
+**`setex(String key, V value, long time)`**:
 
+- **存入并设置过期时间**。
+    
+- 逻辑：如果时间 `>0`，设置过期（毫秒）；如果不设置时间，就调用普通 `set`（永久保存）。
+```java
+
+```
 # 登录注册
 ## 数据库
 ### 表名：user_info (用户信息表)
