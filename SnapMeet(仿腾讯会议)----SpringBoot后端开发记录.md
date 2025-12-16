@@ -194,6 +194,50 @@ public List<V> getQueueList(String key) {
 }
 ```
 
+### 5.高级操作(批量获取与排行榜)
+**`getByKeyPrefix(String keyPrifix)`**:
+
+- **模糊查询**：获取所有以 `keyPrifix` 开头的 Key。
+    
+- **⚠️ 风险提示**：这里使用了 `keys` 命令。在生产环境（数据量大时）**极度危险**，会导致 Redis 阻塞卡死。建议改用 `scan` 命令。
+```java
+public Set<String> getByKeyPrefix(String keyPrifix) {  
+    Set<String> keyList = redisTemplate.keys(keyPrifix + "*");  
+    return keyList;  
+}
+```
+**`getBatch(String keyPrifix)`**:
+
+- **批量获取值**：先查出所有 Key，再用 `multiGet` 一次性把值都取出来，最后组装成 Map。同样受 `keys` 命令性能影响。
+```java
+public Map<String, V> getBatch(String keyPrifix) {  
+    Set<String> keySet = redisTemplate.keys(keyPrifix + "*");  
+    List<String> keyList = new ArrayList<>(keySet);  
+    List<V> keyValueList = redisTemplate.opsForValue().multiGet(keyList);  
+    Map<String, V> resultMap = keyList.stream().collect(Collectors.toMap(key -> key, value -> keyValueList.get(keyList.indexOf(value))));  
+    return resultMap;  
+}
+```
+**`zaddCount` / `getZSetList` (ZSet 有序集合)**:
+
+- **排行榜功能**。
+    
+- `zaddCount`: 给某个元素分数 +1（比如“热搜词热度 +1”）。
+```java
+public void zaddCount(String key, V v) {  
+    redisTemplate.opsForZSet().incrementScore(key, v, 1);  
+}
+```
+    
+- `getZSetList`: 取出分数最高的 `count` 个元素（`reverseRange` 代表倒序，分数高的排前面）。
+```java
+public List<V> getZSetList(String key, Integer count) {  
+    Set<V> topElements = redisTemplate.opsForZSet().reverseRange(key, 0, count);  
+    List<V> list = new ArrayList<>(topElements);  
+    return list;  
+}
+```
+---
 # 登录注册
 ## 数据库
 ### 表名：user_info (用户信息表)
