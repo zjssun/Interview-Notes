@@ -187,6 +187,12 @@ public V rpop(String key) {
     }  
 }
 ```
+**`getQueueList`**: 获取 List 里所有的元素（`0` 到 `-1` 代表全部）。
+```java
+public List<V> getQueueList(String key) {  
+    return redisTemplate.opsForList().range(key, 0, -1);  
+}
+```
 
 # 登录注册
 ## 数据库
