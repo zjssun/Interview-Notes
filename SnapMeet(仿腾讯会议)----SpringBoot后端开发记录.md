@@ -125,6 +125,36 @@ public Long increment(String key) {
 }
 ```
 
+**`incrementex(String key, long milliseconds)`**
+- **带过期的计数**。
+    
+- **场景**：比如“限制用户 1 分钟内只能发送 1 次验证码”。
+    
+- 逻辑：如果是第一次计数（count == 1），说明 Key 刚创建，立刻给它设个过期时间。
+```
+public Long incrementex(String key, long milliseconds) {  
+    Long count = redisTemplate.opsForValue().increment(key, 1);  
+    if (count == 1) {   
+        expire(key, milliseconds);  
+    }  
+    return count;  
+}
+```
+**`decrement(String key)`**：
+- **减法逻辑**。
+    
+- **特殊逻辑**：如果减到 0 或更小，直接**删除该 Key**。这通常用于“库存扣减”场景，卖完了就清掉。
+```java
+public Long decrement(String key) {  
+    Long count = redisTemplate.opsForValue().increment(key, -1);  
+    if (count <= 0) {  
+        redisTemplate.delete(key);  
+    }  
+    logger.info("key:{},减少数量{}", key, count);  
+    return count;  
+}
+```
+
 # 登录注册
 ## 数据库
 ### 表名：user_info (用户信息表)
