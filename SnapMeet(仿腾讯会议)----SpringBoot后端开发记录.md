@@ -289,3 +289,35 @@ public List<V> getZSetList(String key, Integer count) {
 - **唯一索引 (Unique Index):** `idx_key_email` (字段: `email`, 算法: BTREE)
 ### 验证码
 **思路**：使用 [EasyCaptcha](https://mvnrepository.com/artifact/com.github.whvcse/easy-captcha/1.6.2)这个库生成验证码，验证码的答案保存在redis中，返回给用户的是验证码图片和保存这个答案的redis的key。
+
+下面是获取验证码的接口代码：
+**AccountContriller.java**
+```java
+@RequestMapping("/checkCode")  
+public ResponseVO checkCode(){  
+	//生成验证码 参数是长度和宽度
+    ArithmeticCaptcha captcha = new ArithmeticCaptcha(100,42);  
+    String code = captcha.text();  
+    // 存到redis  
+    String checkCodeKey = redisComponent.saveCheckCode(code);  
+    // 验证码base64图片  
+    String checkCodeBase64 = captcha.toBase64();  
+    // 返回redis的key和验证码图片  
+    CheckCodeVO checkCodeVO = new CheckCodeVO();  
+    checkCodeVO.setCheckCode(checkCodeBase64).setCheckCodeKey(checkCodeKey);  
+  
+    return getSuccessResponseVO(checkCodeVO);  
+}
+```
+**RedisComponent.java**
+用UUID生成一段随机数。返回的是这个随机数。
+```java
+@Resource  
+private RedisUtils redisUtils;
+public String saveCheckCode(String code){  
+    String checkCodeKey = UUID.randomUUID().toString();  
+    redisUtils.setex(Constants.REDIS_KEY_CHECK_CODE+checkCodeKey,code,Constants.REDIS_KEY_EXPIRES_ONE_MIN);  
+    return  checkCodeKey;  
+}
+```
+### 注册操作
