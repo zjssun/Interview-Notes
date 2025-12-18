@@ -324,6 +324,10 @@ public String saveCheckCode(String code){
 public String getCheckCode(String checkCodeKey){  
     return (String)redisUtils.get(Constants.REDIS_KEY_CHECK_CODE+checkCodeKey);  
 }
+//清除验证码  
+public void cleanCheckCode(String checkCodeKey){  
+    redisUtils.delete(Constants.REDIS_KEY_CHECK_CODE+checkCodeKey);  
+}
 ```
 
 接口返回内容：
