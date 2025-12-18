@@ -288,4 +288,4 @@ public List<V> getZSetList(String key, Integer count) {
     
 - **唯一索引 (Unique Index):** `idx_key_email` (字段: `email`, 算法: BTREE)
 ### 验证码
-**思路**：使用 [EasyCaptcha](https://mvnrepository.com/artifact/com.github.whvcse/easy-captcha/1.6.2)这个库生成验证码，
+**思路**：使用 [EasyCaptcha](https://mvnrepository.com/artifact/com.github.whvcse/easy-captcha/1.6.2)这个库生成验证码，验证码的答案保存在redis中，返回给用户的是验证码图片和保存这个答案的redis的key。
