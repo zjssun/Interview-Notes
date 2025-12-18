@@ -314,10 +314,19 @@ public ResponseVO checkCode(){
 ```java
 @Resource  
 private RedisUtils redisUtils;
+//存储验证码答案
 public String saveCheckCode(String code){  
     String checkCodeKey = UUID.randomUUID().toString();  
     redisUtils.setex(Constants.REDIS_KEY_CHECK_CODE+checkCodeKey,code,Constants.REDIS_KEY_EXPIRES_ONE_MIN);  
     return  checkCodeKey;  
 }
+//获取验证码答案
+public String getCheckCode(String checkCodeKey){  
+    return (String)redisUtils.get(Constants.REDIS_KEY_CHECK_CODE+checkCodeKey);  
+}
 ```
+
+接口返回内容：
+![](assets/SnapMeet(仿腾讯会议)----SpringBoot后端开发记录/file-20251218171121420.png)
 ### 注册操作
+
