@@ -334,3 +334,4 @@ public void cleanCheckCode(String checkCodeKey){
 ![](assets/SnapMeet(仿腾讯会议)----SpringBoot后端开发记录/file-20251218171121420.png)
 ### 注册操作
 
+**思路：** 
