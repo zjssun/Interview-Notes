@@ -291,7 +291,7 @@ public List<V> getZSetList(String key, Integer count) {
 **思路**：使用 [EasyCaptcha](https://mvnrepository.com/artifact/com.github.whvcse/easy-captcha/1.6.2)这个库生成验证码，验证码的答案保存在redis中，返回给用户的是验证码图片和保存这个答案的redis的key。
 
 下面是获取验证码的接口代码：
-**AccountContriller.java**
+#### **AccountContriller.java**
 ```java
 @RequestMapping("/checkCode")  
 public ResponseVO checkCode(){  
@@ -309,7 +309,7 @@ public ResponseVO checkCode(){
     return getSuccessResponseVO(checkCodeVO);  
 }
 ```
-**RedisComponent.java**
+#### **RedisComponent.java**
 用UUID生成一段随机数。返回的是这个随机数。
 ```java
 @Resource  
