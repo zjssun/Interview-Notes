@@ -361,5 +361,27 @@ public ResponseVO register(@NotEmpty String checkCodeKey,
 ```
 #### UserInfoServiceImpl.java
 ```java
-
+@Override  
+public void register(String email, String nickName, String password) {  
+  
+    // 检查邮箱是否已存在  
+    UserInfo existUser = this.getOne(new LambdaQueryWrapper<UserInfo>()  
+            .eq(UserInfo::getEmail, email));  
+    if (existUser != null) {  
+        throw new BusinessException("该邮箱已被注册");  
+    }  
+  
+    LocalDateTime curDate = LocalDateTime.now();  
+    String userId = StringTools.getRandomNumber(Constants.LENGTH_12);  
+    //准备数据实体  
+    UserInfo userInfo = new UserInfo();  
+    userInfo.setUserId(userId);  
+    userInfo.setEmail(email);  
+    userInfo.setNickName(nickName);  
+    userInfo.setPassword(StringTools.encodeByMD5(password));  
+    userInfo.setCreateTime(curDate);  
+    userInfo.setLastOffTime(curDate.toInstant(ZoneOffset.of("+8")).toEpochMilli());  
+    userInfo.setStatus(UserStatusEnum.ENABLE.getStatus());  
+    this.save(userInfo);  
+}
 ```
