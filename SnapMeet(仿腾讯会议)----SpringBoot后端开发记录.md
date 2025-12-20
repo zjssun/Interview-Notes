@@ -339,7 +339,7 @@ public void cleanCheckCode(String checkCodeKey){
 2. 判断验证码是否正确，不正确则抛出异常。
 3. 把数据存到数据库。
 4. 清理redis中的验证码数据。
-#### AccountController
+#### AccountController.java
 ```java
 @RequestMapping("/register")  
 public ResponseVO register(@NotEmpty String checkCodeKey,  
@@ -358,4 +358,8 @@ public ResponseVO register(@NotEmpty String checkCodeKey,
         redisComponent.cleanCheckCode(checkCodeKey);  
     }  
 }
+```
+#### UserInfoServiceImpl.java
+```java
+
 ```
