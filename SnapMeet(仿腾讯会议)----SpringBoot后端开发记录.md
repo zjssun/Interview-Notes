@@ -378,6 +378,7 @@ public void register(String email, String nickName, String password) {
     userInfo.setUserId(userId);  
     userInfo.setEmail(email);  
     userInfo.setNickName(nickName);  
+    userInfo.setSex(2);
     //保存的密码进行md5加密
     userInfo.setPassword(StringTools.encodeByMD5(password));  
     userInfo.setCreateTime(curDate);  
