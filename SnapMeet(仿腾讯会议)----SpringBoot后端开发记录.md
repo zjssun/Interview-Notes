@@ -340,3 +340,22 @@ public void cleanCheckCode(String checkCodeKey){
 3. 把数据存到数据库。
 4. 清理redis中的验证码数据。
 #### AccountController
+```java
+@RequestMapping("/register")  
+public ResponseVO register(@NotEmpty String checkCodeKey,  
+                           @NotEmpty @Email String email,  
+                           @NotEmpty @Size(max=20)String password,  
+                           @NotEmpty @Size(max=20) String nickName,  
+                           @NotEmpty String checkCode){  
+    try {  
+        if(!checkCode.equalsIgnoreCase(redisComponent.getCheckCode(checkCodeKey))){  
+            throw new BusinessException("图片验证码不正确");  
+        }  
+  
+        this.userInfoService.register(email,password,nickName);  
+        return getSuccessResponseVO(null);  
+    }finally {  
+        redisComponent.cleanCheckCode(checkCodeKey);  
+    }  
+}
+```
