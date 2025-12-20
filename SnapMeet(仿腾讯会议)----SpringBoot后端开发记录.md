@@ -334,4 +334,4 @@ public void cleanCheckCode(String checkCodeKey){
 ![](assets/SnapMeet(仿腾讯会议)----SpringBoot后端开发记录/file-20251218171121420.png)
 ### 注册操作
 
-**思路：** 前端提交的参数：验证码的redis key
+**思路：** 前端提交的参数：验证码的redis key、
