@@ -384,6 +384,7 @@ public void register(String email, String nickName, String password) {
     userInfo.setCreateTime(curDate);  
     userInfo.setLastOffTime(curDate.toInstant(ZoneOffset.of("+8")).toEpochMilli());  
     userInfo.setStatus(UserStatusEnum.ENABLE.getStatus());  
+    userInfo.setMeeting(StringTools.getMeetingNoOrMeetingId());
     // 保存到数据库
     this.save(userInfo);  
 }
