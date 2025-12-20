@@ -370,7 +370,7 @@ public void register(String email, String nickName, String password) {
     if (existUser != null) {  
         throw new BusinessException("该邮箱已被注册");  
     }  
-  
+	// 生成时间和用户id
     LocalDateTime curDate = LocalDateTime.now();  
     String userId = StringTools.getRandomNumber(Constants.LENGTH_12);  
     //准备数据实体  
@@ -378,10 +378,12 @@ public void register(String email, String nickName, String password) {
     userInfo.setUserId(userId);  
     userInfo.setEmail(email);  
     userInfo.setNickName(nickName);  
+    //保存的密码进行md5加密
     userInfo.setPassword(StringTools.encodeByMD5(password));  
     userInfo.setCreateTime(curDate);  
     userInfo.setLastOffTime(curDate.toInstant(ZoneOffset.of("+8")).toEpochMilli());  
     userInfo.setStatus(UserStatusEnum.ENABLE.getStatus());  
+    // 保存到数据库
     this.save(userInfo);  
 }
 ```
