@@ -332,7 +332,7 @@ public void cleanCheckCode(String checkCodeKey){
 
 接口返回内容：
 ![](assets/SnapMeet(仿腾讯会议)----SpringBoot后端开发记录/file-20251218171121420.png)
-### 注册操作
+### 注册接口
 
 **思路：** 
 1. 前端需提交的参数：验证码的redis key、邮箱、用户名和密码。
@@ -387,3 +387,6 @@ public void register(String email, String nickName, String password) {
     this.save(userInfo);  
 }
 ```
+
+### 登录接口
+**思路：**
