@@ -336,4 +336,4 @@ public void cleanCheckCode(String checkCodeKey){
 
 **思路：** 
 1. 前端需提交的参数：验证码的redis key、邮箱、用户名和密码。
-2. 
+2. 判断验证码是否正确，不正确则抛出异常。
