@@ -392,4 +392,5 @@ public void register(String email, String nickName, String password) {
 
 ### 登录接口
 **思路：**
-1. 
+1. 用户输入正确的邮箱、密码和验证码。检查账户状态
+2. 
