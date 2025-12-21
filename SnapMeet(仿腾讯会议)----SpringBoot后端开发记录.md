@@ -266,9 +266,9 @@ public List<V> getZSetList(String key, Integer count) {
 }
 ```
 ---
-# 登录注册
-## 数据库
-### 表名：user_info (用户信息表)
+# 登录与注册
+### 数据库
+#### 表名：user_info (用户信息表)
 
 | 字段名 | 数据类型 | 长度 | 非空 | 默认值 | 键 | 备注 |
 | :--- | :--- | :--- | :---: | :---: | :---: | :--- |
@@ -456,4 +456,6 @@ public void saveTokenUserInfoDto(TokenUserInfoDto tokenUserInfoDto){
 }
 ```
 
-## Netty
+# Netty
+### 准备工作
+
