@@ -459,4 +459,17 @@ public void saveTokenUserInfoDto(TokenUserInfoDto tokenUserInfoDto){
 # Netty
 ### 准备工作
 Netty 服务端启动时，通常会调用 `channel().closeFuture().sync()` 来保持服务运行。**这行代码是阻塞的**，意味着程序会卡在这里一直等待，直到服务关闭。所以需要**开辟新线程**来避免阻塞主程序。
-
+#### InitRun.java
+```java
+@Component  
+public class InitRun implements ApplicationRunner {  
+  
+    @Resource  
+    private NettyWebSocketStarter nettyWebSocketStarter;  
+  
+    @Override  
+    public void run(ApplicationArguments args) throws Exception {  
+        new Thread(nettyWebSocketStarter).start();  
+    }  
+}
+```
