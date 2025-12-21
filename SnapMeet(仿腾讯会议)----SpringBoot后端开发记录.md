@@ -473,3 +473,15 @@ public class InitRun implements ApplicationRunner {
     }  
 }
 ```
+#### NettyWebSocketStarter.java
+```java
+@Component  
+@Slf4j  
+public class NettyWebSocketStarter implements Runnable{  
+    @Override  
+    public void run() {  
+        log.info("异步起动{}",Thread.currentThread().getName());  
+    }
+}
+```
+1
