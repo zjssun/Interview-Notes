@@ -395,3 +395,21 @@ public void register(String email, String nickName, String password) {
 1. 用户输入正确的邮箱、密码和验证码。需要检查账户状态、是否已登录(**如果上一次登录时间小于登出时间则没重复登录**)。
 2. 更新登录时间，保存tokenUserInfoDto数据到Redis,给客户端返回userInfoVO。
 #### AccountController.java
+```java
+@RequestMapping("/login")  
+public ResponseVO login(@NotEmpty String checkCodeKey,  
+                        @NotEmpty @Email String email,  
+                        @NotEmpty @Size(max=32)String password,  
+                        @NotEmpty String checkCode){  
+    try {  
+        if(!checkCode.equalsIgnoreCase(redisComponent.getCheckCode(checkCodeKey))){  
+            throw new BusinessException("图片验证码不正确");  
+        }  
+        UserInfoVO userInfoVO = this.userInfoService.login(email,password);  
+        return getSuccessResponseVO(userInfoVO);  
+    }finally {  
+        redisComponent.cleanCheckCode(checkCodeKey);  
+    }  
+}
+```
+#### 
