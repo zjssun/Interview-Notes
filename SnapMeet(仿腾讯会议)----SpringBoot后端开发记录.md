@@ -310,7 +310,7 @@ public ResponseVO checkCode(){
 }
 ```
 #### **RedisComponent.java**
-用UUID生成一段随机数。返回的是这个随机数。
+用UUID生成一段随机数作为key。返回的是这个随机数。
 ```java
 @Resource  
 private RedisUtils redisUtils;
@@ -392,3 +392,4 @@ public void register(String email, String nickName, String password) {
 
 ### 登录接口
 **思路：**
+1. 
