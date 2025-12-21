@@ -447,3 +447,12 @@ public UserInfoVO login(String email, String password) {
     return userInfoVO;  
 }
 ```
+#### RedisComponent.java
+```java
+//保存TokenUserInfoDto  
+public void saveTokenUserInfoDto(TokenUserInfoDto tokenUserInfoDto){  
+    redisUtils.setex(Constants.REDIS_KEY_WS_TOKEN+tokenUserInfoDto.getToken(),tokenUserInfoDto,Constants.REDIS_KEY_EXPIRES_DAY);  
+    redisUtils.setex(Constants.REDIS_KEY_WS_TOKEN_USERID+tokenUserInfoDto.getUserId(),tokenUserInfoDto.getToken(),Constants.REDIS_KEY_EXPIRES_DAY);  
+}
+```
+
