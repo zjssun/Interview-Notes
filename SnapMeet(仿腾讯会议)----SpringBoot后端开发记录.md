@@ -506,7 +506,7 @@ pipeline.addLast(new HandlerHeartBeat());
 ```java
 pipeline.addLast(handlerTokenValidation);  
 ```
-
+**作用**: 门卫。**自定义**的类。在 WebSocket 握手成功前或刚连接时，校验用户的 Token。如果校验失败，会直接关闭连接，防止非法用户进入后续流程。
 
 ##### 完整代码
 ```java
