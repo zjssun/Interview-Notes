@@ -641,6 +641,8 @@ if(tokenUserInfoDto==null){
 ```java
 channelHandlerContext.fireChannelRead(fullHttpRequest.retain());
 ```
+##### 辅助方法
+`senErrorResponse`
 
 ##### 完整代码：
 ```java
