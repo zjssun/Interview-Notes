@@ -484,7 +484,7 @@ serverBootstrap.group(boosGroup, workerGroup);
 - **`workerGroup` (Worker)**: 负责“干活”。处理具体的 IO 操作，比如读取数据、解码、业务逻辑执行、发送数据。
 ##### 2. 流水线 (ChannelPipeline) —— 最关键的部分
 Netty 处理网络数据就像流水线一样，`initChannel` 方法定义了这条流水线上的工序。数据进来后，会依次经过这些 Handler。
-###### HTTP 基础支持层
+###### A. HTTP 基础支持层
 ````java
 pipeline.addLast(new HttpServerCodec()); 
 ````
@@ -493,7 +493,7 @@ pipeline.addLast(new HttpServerCodec());
 pipeline.addLast(new HttpObjectAggregator(64*1024));
 ```
 **作用**: 组装员，HTTP 请求可能会被拆分成很多片段（Header, Chunk 1, Chunk 2...）。这个处理器把它们聚合成一个完整的 `FullHttpRequest` 对象，方便后续处理。参数 `64*1024` 限制了最大内容长度为 64KB，防止大包攻击。
-###### 跳与保活层
+###### B. 跳与保活层
 ```java
  pipeline.addLast(new IdleStateHandler(6,0,0));  
 ```
@@ -502,11 +502,31 @@ pipeline.addLast(new HttpObjectAggregator(64*1024));
 pipeline.addLast(new HandlerHeartBeat());  
 ```
 **作用**: 医生。**自定义**的类。它会捕获上面抛出的 `IdleStateEvent`。如果检测到超时事件，就判定客户端掉线，关闭连接。
-###### 业务校验层
+###### C. 业务校验层
 ```java
 pipeline.addLast(handlerTokenValidation);  
 ```
 **作用**: 门卫。**自定义**的类。在 WebSocket 握手成功前或刚连接时，校验用户的 Token。如果校验失败，会直接关闭连接，防止非法用户进入后续流程。
+###### D.WebSocket 协议层
+```java
+ pipeline.addLast(new WebSocketServerProtocolHandler("/ws",null,true,6553,true,true,10000L));  
+```
+**作用**: WebSocket 总管。它帮你处理了所有复杂的 WebSocket 协议细节。
+**参数详解**:
+
+- `"ws"`: 访问路径。客户端连接地址类似于 `ws://ip:port/ws`。
+    
+- `null`: 不指定子协议。
+    
+- `true`: 允许 WebSocket 扩展。
+    
+- `6553`: **MaxFrameSize**。允许的最大帧载荷长度。
+    
+- `true` (`allowMaskMismatch`): 允许掩码不匹配（宽松模式）。
+    
+- `true` (`checkStartsWith`): 检查路径是否以 "ws" 开头。
+    
+- `10000L`: 握手超时时间 10秒。
 
 ##### 完整代码
 ```java
@@ -556,7 +576,7 @@ public class NettyWebSocketStarter implements Runnable{
                             * int maxFrameSize, 设置最大帧数 6553                            * boolean allowMaskMismatch, 是否允许掩码不匹配  
                             * boolean checkStartsWith, 是否严格检查路径开头  
                             * long handshakeTimeoutMillis 握手超时  
-                            * */                            pipeline.addLast(new WebSocketServerProtocolHandler("ws",null,true,6553,true,true,10000L));  
+                            * */                            pipeline.addLast(new WebSocketServerProtocolHandler("/ws",null,true,6553,true,true,10000L));  
   
                             pipeline.addLast(handlerWebSocket);  
                         }  
