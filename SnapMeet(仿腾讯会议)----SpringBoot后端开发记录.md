@@ -642,10 +642,12 @@ if(tokenUserInfoDto==null){
 channelHandlerContext.fireChannelRead(fullHttpRequest.retain());
 ```
 ##### 辅助方法
-**`checkToken(String token)`**
+**`checkToken(String token)`**:
+- 简单的业务封装，去 Redis 查用户信息。
+
 **`senErrorResponse(ChannelHandlerContext ctx)`**:
 - 构建一个 HTTP 403 响应，告诉客户端 Token 无效。
-    
+	
 - **`.addListener(ChannelFutureListener.CLOSE)`**: 这是一个回调。意味着“当响应数据发送完毕后，**立即断开 TCP 连接**”。这对于安全性很重要，不给非法连接留活口。
 ##### 完整代码：
 ```java
