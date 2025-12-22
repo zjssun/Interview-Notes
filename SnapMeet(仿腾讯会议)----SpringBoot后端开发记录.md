@@ -533,6 +533,7 @@ pipeline.addLast(handlerWebSocket);
 ```
 **作用**: 具体的业务员。**自定义**的类。
 
+
 ##### 完整代码
 ```java
 @Component  
