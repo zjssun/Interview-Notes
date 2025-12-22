@@ -476,7 +476,6 @@ public class InitRun implements ApplicationRunner {
 ```
 #### NettyWebSocketStarter.java
 
-
 ```java
 @Component  
 @Slf4j  
