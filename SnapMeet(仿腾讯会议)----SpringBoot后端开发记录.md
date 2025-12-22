@@ -476,11 +476,29 @@ public class InitRun implements ApplicationRunner {
 ```
 #### NettyWebSocketStarter.java
 下面是Netty WebSocket 服务端启动逻辑。
+##### 1.核心组件：EventLoopGroup
 ```java
 serverBootstrap.group(boosGroup, workerGroup);
 ```
 - **`boosGroup` (Boss)**: 负责“接待”。它只做一件事：监听端口，接受客户端的连接请求。一旦连接建立，就扔给 Worker 处理。
 - **`workerGroup` (Worker)**: 负责“干活”。处理具体的 IO 操作，比如读取数据、解码、业务逻辑执行、发送数据。
+##### 2. 流水线 (ChannelPipeline) —— 最关键的部分
+Netty 处理网络数据就像流水线一样，`initChannel` 方法定义了这条流水线上的工序。数据进来后，会依次经过这些 Handler。
+###### HTTP 基础支持层
+````java
+pipeline.addLast(new HttpServerCodec()); 
+````
+**作用**: 翻译官，将字节流解码成 HTTP 请求对象，或将 HTTP 响应编码成字节流。
+```java
+pipeline.addLast(new HttpObjectAggregator(64*1024));
+```
+**作用**: 组装员，HTTP 请求可能会被拆分成很多片段（Header, Chunk 1, Chunk 2...）。这个处理器把它们聚合成一个完整的 `FullHttpRequest` 对象，方便后续处理。参数 `64*1024` 限制了最大内容长度为 64KB，防止大包攻击。
+###### 跳与保活层
+```java
+ pipeline.addLast(new IdleStateHandler(6,0,0));  
+```
+
+##### 完整代码
 ```java
 @Component  
 @Slf4j  
@@ -550,4 +568,3 @@ public class NettyWebSocketStarter implements Runnable{
     }  
 }
 ```
-1
