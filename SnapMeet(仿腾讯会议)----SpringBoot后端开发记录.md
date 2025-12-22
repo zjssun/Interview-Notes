@@ -506,7 +506,7 @@ pipeline.addLast(new HandlerHeartBeat());
 ```java
 pipeline.addLast(handlerTokenValidation);  
 ```
-**作用**: 门卫。**自定义**的类。在 WebSocket 握手成功前或刚连接时，校验用户的 Token。如果校验失败，会直接关闭连接，防止非法用户进入后续流程。
+**作用**: 门卫。**自定义**的类。在 WebSocket 握手成功前，校验用户的 Token。如果校验失败，会直接关闭连接，防止非法用户进入后续流程。
 ###### D.WebSocket 协议层
 ```java
  pipeline.addLast(new WebSocketServerProtocolHandler("/ws",null,true,6553,true,true,10000L));  
@@ -604,6 +604,49 @@ public class NettyWebSocketStarter implements Runnable{
 ```
 
 #### HandlerTokenValidation.java
+这个类用来在 WebSocket 握手之前拦截 HTTP 请求，进行 **Token 身份校验**。
 
 ##### 完整代码：
-
+```java
+@Component  
+@ChannelHandler.Sharable  
+@Slf4j  
+public class HandlerTokenValidation extends SimpleChannelInboundHandler<FullHttpRequest> {  
+  
+    @Resource  
+    private RedisComponent redisComponent;  
+  
+    @Override  
+    protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {  
+        String uri = fullHttpRequest.uri();  
+        QueryStringDecoder queryStringDecoder = new QueryStringDecoder(uri);  
+        List<String> tokens = queryStringDecoder.parameters().get("token");  
+        if(tokens==null){  
+            senErrorResponse(channelHandlerContext);  
+        }  
+        String token = tokens.get(0);  
+        TokenUserInfoDto tokenUserInfoDto = checkToken(token);  
+        if(tokenUserInfoDto==null){  
+            log.info("校验token失败{}",token);  
+            senErrorResponse(channelHandlerContext);  
+        }  
+        channelHandlerContext.fireChannelRead(fullHttpRequest.retain());  
+        //TODO 连接成功后初始化工作  
+  
+    }  
+  
+    private TokenUserInfoDto checkToken(String token){  
+        if(StringTools.isEmpty(token)){  
+            return null;  
+        }  
+        return redisComponent.getTokenUserInfoDto(token);  
+    }  
+  
+    private void senErrorResponse(ChannelHandlerContext ctx){  
+        FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1,HttpResponseStatus.FORBIDDEN, Unpooled.copiedBuffer("token无效", CharsetUtil.UTF_8));  
+        response.headers().set(HttpHeaderNames.CONTENT_TYPE,"text/plain ;charset=UTF-8");  
+        response.headers().set(HttpHeaderNames.CONTENT_LENGTH,response.content().readableBytes());  
+        ctx.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);  
+    }  
+}
+```
