@@ -605,6 +605,42 @@ public class NettyWebSocketStarter implements Runnable{
 
 #### HandlerTokenValidation.java
 这个类用来在 WebSocket 握手之前拦截 HTTP 请求，进行 **Token 身份校验**。
+##### 核心注解
+**`@Component`**: 将该类交给 Spring 管理，这样就可以在里面使用 `@Resource` 注入 Redis 组件。
+**`@ChannelHandler.Sharable`**:标记这个 Handler 实例是**线程安全**的，可以被多个 Channel（多个客户端连接）共享。
+##### 主要逻辑
+###### A. 提取参数
+```java
+String uri = fullHttpRequest.uri();
+QueryStringDecoder queryStringDecoder = new QueryStringDecoder(uri);
+List<String> tokens = queryStringDecoder.parameters().get("token");
+```
+- WebSocket 连接为：`ws://localhost:6061/ws/?token=xxxxxx`。
+    
+- 这里使用 `QueryStringDecoder` 解析 URL 里的参数，尝试获取名为 `token` 的值。
+###### B. 空值校验
+```java
+if(tokens==null){
+    senErrorResponse(channelHandlerContext);
+    return;
+}
+String token = tokens.get(0);
+```
+- 如果 URL 里根本没带 `token` 参数，直接调用 `senErrorResponse` 发送错误响应。
+###### C. Redis 业务校验
+```java
+TokenUserInfoDto tokenUserInfoDto = checkToken(token);
+if(tokenUserInfoDto==null){
+    log.info("校验token失败{}",token);
+    senErrorResponse(channelHandlerContext);
+    return;
+}
+```
+- 调用 `checkToken` 去 Redis 查询这个 token 是否有效。如果无效（返回 null），则记录日志并拒绝连接。
+###### D. 放行请求
+```java
+channelHandlerContext.fireChannelRead(fullHttpRequest.retain());
+```
 
 ##### 完整代码：
 ```java
@@ -623,12 +659,14 @@ public class HandlerTokenValidation extends SimpleChannelInboundHandler<FullHttp
         List<String> tokens = queryStringDecoder.parameters().get("token");  
         if(tokens==null){  
             senErrorResponse(channelHandlerContext);  
+            return;
         }  
         String token = tokens.get(0);  
         TokenUserInfoDto tokenUserInfoDto = checkToken(token);  
         if(tokenUserInfoDto==null){  
             log.info("校验token失败{}",token);  
             senErrorResponse(channelHandlerContext);  
+            return;
         }  
         channelHandlerContext.fireChannelRead(fullHttpRequest.retain());  
         //TODO 连接成功后初始化工作  
