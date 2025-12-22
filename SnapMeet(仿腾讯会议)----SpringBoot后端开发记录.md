@@ -603,6 +603,26 @@ public class NettyWebSocketStarter implements Runnable{
 }
 ```
 
+#### HandlerHeartBeat.java
+```java
+@Slf4j  
+public class HandlerHeartBeat extends ChannelDuplexHandler {  
+    @Override  
+    public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {  
+        if(evt instanceof IdleStateEvent){  
+            IdleStateEvent e = (IdleStateEvent) evt;  
+            if(e.state() == IdleState.READER_IDLE){  
+                Attribute<String> attribute = ctx.channel().attr(AttributeKey.valueOf(ctx.channel().id().toString()));  
+                String userId = attribute.get();  
+                log.info("用户{}没有发送心跳,断开连接",userId);  
+                ctx.close();  
+            }else if(e.state() == IdleState.WRITER_IDLE){  
+                ctx.writeAndFlush("heart");  
+            }  
+        }  
+    }  
+}
+```
 #### HandlerTokenValidation.java
 这个类用来在 WebSocket 握手之前拦截 HTTP 请求，进行 **Token 身份校验**。
 ##### 核心注解
