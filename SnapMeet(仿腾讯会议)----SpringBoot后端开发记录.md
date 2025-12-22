@@ -498,6 +498,10 @@ pipeline.addLast(new HttpObjectAggregator(64*1024));
  pipeline.addLast(new IdleStateHandler(6,0,0));  
 ```
 **作用**: 计时器。如果 6 秒内没有**读**到客户端发来的数据，它会触发一个 `IdleStateEvent` 事件。
+```java
+pipeline.addLast(new HandlerHeartBeat());  
+```
+
 ##### 完整代码
 ```java
 @Component  
