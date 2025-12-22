@@ -476,7 +476,11 @@ public class InitRun implements ApplicationRunner {
 ```
 #### NettyWebSocketStarter.java
 下面是Netty WebSocket 服务端启动逻辑。
-**`boosGroup` (Boss)**: 负责“接待”。它只做一件事：监听端口，接受客户端的连接请求。一旦连接建立，就扔给 Worker 处理。
+```java
+serverBootstrap.group(boosGroup, workerGroup);
+```
+- **`boosGroup` (Boss)**: 负责“接待”。它只做一件事：监听端口，接受客户端的连接请求。一旦连接建立，就扔给 Worker 处理。
+- **`workerGroup` (Worker)**: 负责“干活”。处理具体的 IO 操作，比如读取数据、解码、业务逻辑执行、发送数据。
 ```java
 @Component  
 @Slf4j  
