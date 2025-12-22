@@ -501,6 +501,12 @@ pipeline.addLast(new HttpObjectAggregator(64*1024));
 ```java
 pipeline.addLast(new HandlerHeartBeat());  
 ```
+**作用**: 医生。**自定义**的类。它会捕获上面抛出的 `IdleStateEvent`。如果检测到超时事件，就判定客户端掉线，关闭连接。
+###### 业务校验层
+```java
+pipeline.addLast(handlerTokenValidation);  
+```
+
 
 ##### 完整代码
 ```java
