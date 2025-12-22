@@ -514,7 +514,7 @@ pipeline.addLast(handlerTokenValidation);
 **作用**: WebSocket 总管。它帮你处理了所有复杂的 WebSocket 协议细节。
 **参数详解**:
 
-- `"ws"`: 访问路径。客户端连接地址类似于 `ws://ip:port/ws`。
+- `"ws"`: 访问路径。客户端连接地址类似于 `ws://localhost:6061/ws/?token=1a5575159602929842cbe4c81dfe0cf5`。
     
 - `null`: 不指定子协议。
     
@@ -527,6 +527,11 @@ pipeline.addLast(handlerTokenValidation);
 - `true` (`checkStartsWith`): 检查路径是否以 "ws" 开头。
     
 - `10000L`: 握手超时时间 10秒。
+###### E. 最终业务层
+```java
+pipeline.addLast(handlerWebSocket);  
+```
+**作用**: 具体的业务员。**自定义**的类。
 
 ##### 完整代码
 ```java
