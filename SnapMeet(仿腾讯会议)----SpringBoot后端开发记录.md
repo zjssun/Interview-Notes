@@ -781,3 +781,4 @@ public static final ConcurrentHashMap<String, ChannelGroup> MEETING_ROOM_CONTEXT
 - `ChannelGroup` 是 Netty 自带的一个非常强大的集合，它自动管理里面的 Channel。**重点：当 Channel 关闭（用户断线）时，ChannelGroup 会自动把它踢出去，不需要手动去 Group 里删。**
 
 ##### 2.`addContext` (核心绑定方法)
+
