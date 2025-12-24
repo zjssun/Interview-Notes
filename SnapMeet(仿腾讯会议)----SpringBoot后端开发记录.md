@@ -457,7 +457,7 @@ public void saveTokenUserInfoDto(TokenUserInfoDto tokenUserInfoDto){
 ```
 
 # Netty
-### 准备工作
+### Netty WebSocket 服务端
 Netty 服务端启动时，通常会调用 `channel().closeFuture().sync()` 来保持服务运行。**这行代码是阻塞的**，意味着程序会卡在这里一直等待，直到服务关闭。所以需要**开辟新线程**来避免阻塞主程序。
 #### InitRun.java
 **`ApplicationRunner`**：这是 Spring Boot 提供的一个接口。它的 `run` 方法会在 **Spring 容器完全初始化完成**之后被回调。
@@ -741,4 +741,4 @@ public class HandlerWebSocket extends SimpleChannelInboundHandler<TextWebSocketF
 }
 ```
 
-### 
+### Netty 连接管理器
