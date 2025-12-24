@@ -743,3 +743,6 @@ public class HandlerWebSocket extends SimpleChannelInboundHandler<TextWebSocketF
 
 ### Netty 连接管理器
 **将 Netty 的物理连接（Channel）与用户（UserId）以及业务场景（MeetingId）绑定起来**，以便后续能通过 UserId 或 MeetingId 找到对应的连接去推送消息。
+
+**整体设计思路：**
+
