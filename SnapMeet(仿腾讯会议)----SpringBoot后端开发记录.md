@@ -842,3 +842,29 @@ public void sendMessage(MessageSendDto messageSendDto) {
     }
 }
 ```
+发到会议室
+```java
+private void sendMsg2Group(MessageSendDto messageSendDto){  
+    if(messageSendDto.getMeetingId()==null){  
+        return;  
+    }  
+    ChannelGroup group = MEETING_ROOM_CONTEXT_MAP.get(messageSendDto.getMeetingId());  
+    if(group==null){  
+        return;  
+    }  
+    group.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageSendDto)));  
+}
+```
+发给个人
+```java
+private void sendMsg2User(MessageSendDto messageSendDto){  
+    if(messageSendDto.getReceiveUserId()==null){  
+        return;  
+    }  
+    Channel channel = USER_CONTEXT_MAP.get(messageSendDto.getReceiveUserId());  
+    if(channel==null){  
+        return;  
+    }  
+    channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageSendDto)));  
+}
+```
