@@ -742,6 +742,8 @@ public class HandlerWebSocket extends SimpleChannelInboundHandler<TextWebSocketF
 ```
 
 ### Netty 连接管理器
+**代码意图**：实现了一个标准的 WebSocket 会话管理器，支持单发和会议群发。
+
 **将 Netty 的物理连接（Channel）与用户（UserId）以及业务场景（MeetingId）绑定起来**，以便后续能通过 UserId 或 MeetingId 找到对应的连接去推送消息。
 
 **整体设计思路：**
@@ -781,5 +783,33 @@ public static final ConcurrentHashMap<String, ChannelGroup> MEETING_ROOM_CONTEXT
 - `ChannelGroup` 是 Netty 自带的一个非常强大的集合，它自动管理里面的 Channel。**重点：当 Channel 关闭（用户断线）时，ChannelGroup 会自动把它踢出去，不需要手动去 Group 里删。**
 
 ##### 2.`addContext` (核心绑定方法)
-
 这一步做了很多事，既完成了内存中的连接注册，也同步了数据库状态，还处理了业务上的“恢复会议上下文”
+```java
+public void addContext(String userId, io.netty.channel.Channel channel){
+    try {
+        // 1. 【重点问题】给 Channel 打上 UserId 的标签
+        String channelId = channel.id().toString();
+
+        channel.attr(attributeKey).set(userId);
+
+        // 2. 存入全局用户表
+        USER_CONTEXT_MAP.put(userId, channel);
+
+        // 3. 更新数据库：记录用户最后登录时间
+        UserInfo userInfo = new UserInfo();
+        userInfo.setLastLoginTime(System.currentTimeMillis());
+        userInfoMapper.update(userInfo, new LambdaQueryWrapper<UserInfo>().eq(UserInfo::getUserId, userId));
+
+        // 4. “断线重连”逻辑：检查 Redis，看用户之前是否还在某个会议里
+        TokenUserInfoDto tokenUserInfoDto = redisComponent.getTokenUserInfoDtoByUserId(userId);
+        if(tokenUserInfoDto.getCurrentMeetingId() == null){
+            return;
+        }
+        // 5. 如果在会议里，直接把这个新连接加入会议组
+        addMeetingRoom(tokenUserInfoDto.getCurrentMeetingId(),userId);
+
+    }catch (Exception e){
+        log.error("初始化连接失败",e);
+    }
+}
+```
