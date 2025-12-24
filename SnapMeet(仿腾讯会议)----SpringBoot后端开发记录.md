@@ -813,3 +813,21 @@ public void addContext(String userId, io.netty.channel.Channel channel){
     }
 }
 ```
+##### 3. `addMeetingRoom` (加入会议)
+```java
+public void addMeetingRoom(String meetingId,String userId){
+    // 1. 先找到这个人的物理连接
+    Channel context = USER_CONTEXT_MAP.get(userId);
+    if(null==context){ return; }
+
+    // 2. 找会议室的组，如果没有就新建一个
+    ChannelGroup group = MEETING_ROOM_CONTEXT_MAP.get(meetingId);
+    if(group==null){
+        // GlobalEventExecutor.INSTANCE 是全局事件执行器，用于自动管理 Group 里连接的生命周期
+        group = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+        MEETING_ROOM_CONTEXT_MAP.put(meetingId,group);
+    }
+    // 3. 把人加进去
+    group.add(context); // context 就是 channel
+}
+```
