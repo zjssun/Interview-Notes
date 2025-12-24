@@ -782,3 +782,4 @@ public static final ConcurrentHashMap<String, ChannelGroup> MEETING_ROOM_CONTEXT
 
 ##### 2.`addContext` (核心绑定方法)
 
+这一步做了很多事，既完成了内存中的连接注册，也同步了数据库状态，还处理了业务上的“恢复会议上下文”
