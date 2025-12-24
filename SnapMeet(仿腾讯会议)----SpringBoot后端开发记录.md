@@ -762,3 +762,10 @@ public class HandlerWebSocket extends SimpleChannelInboundHandler<TextWebSocketF
     - **群聊/会议**：通过 MeetingId -> 查 Map 拿到 ChannelGroup -> 群发。
 #### HandlerTokenValidation.java
 
+```java
+//channelHandlerContext.fireChannelRead(fullHttpRequest.retain());  
+  
+//连接成功后初始化工作  
+channelContextUtils.addContext(tokenUserInfoDto.getUserId(),channelHandlerContext.channel());
+```
+
