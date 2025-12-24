@@ -745,4 +745,19 @@ public class HandlerWebSocket extends SimpleChannelInboundHandler<TextWebSocketF
 **将 Netty 的物理连接（Channel）与用户（UserId）以及业务场景（MeetingId）绑定起来**，以便后续能通过 UserId 或 MeetingId 找到对应的连接去推送消息。
 
 **整体设计思路：**
+- **握手阶段**：用户连接 -> `HandlerTokenValidation` 校验 Token。
+    
+- **绑定阶段**：校验通过 -> 调用 `ChannelContextUtils.addContext`。
+    
+    - 把 `UserId` 贴在 `Channel` 上（打标签）。
+        
+    - 把 `UserId` 和 `Channel` 的映射关系存入全局 Map。
+        
+    - 如果用户正在会议中，把 `Channel` 加入对应的会议组（ChannelGroup）。
+        
+- **通信阶段**：
+    
+    - **单聊**：通过 UserId -> 查 Map 拿到 Channel -> 发送。
+        
+    - **群聊/会议**：通过 MeetingId -> 查 Map 拿到 ChannelGroup -> 群发。
 
