@@ -868,3 +868,16 @@ private void sendMsg2User(MessageSendDto messageSendDto){
     channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(messageSendDto)));  
 }
 ```
+##### 5. 关闭会话
+```java
+public void closeContext(String userId){  
+    if(StringTools.isEmpty(userId)){  
+        return;  
+    }  
+    Channel channel = USER_CONTEXT_MAP.get(userId);  
+    USER_CONTEXT_MAP.remove(userId);  
+    if(channel!=null){  
+        channel.close();  
+    }  
+}
+```
