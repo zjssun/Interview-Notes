@@ -831,3 +831,14 @@ public void addMeetingRoom(String meetingId,String userId){
     group.add(context); // context 就是 channel
 }
 ```
+##### 4.`sendMessage` (消息路由)
+```java
+public void sendMessage(MessageSendDto messageSendDto) {
+    // 根据类型分发：是发给人，还是发给群
+    if(MessageSend2TypeEnum.USER.getType().equals(messageSendDto.getMessageSend2Type())){
+        sendMsg2User(messageSendDto);
+    }else {
+        sendMsg2Group(messageSendDto);
+    }
+}
+```
