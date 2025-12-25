@@ -883,7 +883,7 @@ public void closeContext(String userId){
 ```
 
 ### 会议室
-##### 会议表
+#### 需要用到的数据库表
 ##### **meeting_info(会议信息表)**：
 
 | 字段名                | 数据类型     | 长度  | 非空  | 默认值  |  键  | 备注  |
@@ -910,4 +910,4 @@ public void closeContext(String userId){
 | **member_type** | int | 1 | 否 | NULL | | - |
 | **meeting_status** | int | 4 | 否 | NULL | | - |
 
-#### 
+#### 获取用户会议历史
