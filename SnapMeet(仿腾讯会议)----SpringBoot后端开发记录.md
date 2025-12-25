@@ -917,4 +917,5 @@ public void closeContext(String userId){
 @TableField(exist = false)  
 private Integer memberCount;
 ```
-##### 
+##### MeetingInfoController.java
+`/meeting/loadMeeting` 接口
