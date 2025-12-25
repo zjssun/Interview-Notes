@@ -911,3 +911,5 @@ public void closeContext(String userId){
 | **meeting_status** | int | 4 | 否 | NULL | | - |
 
 #### 获取用户会议历史
+##### MeetingInfo.java
+在生成的类里加入，` ` 人数字多
