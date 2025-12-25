@@ -898,4 +898,14 @@ public void closeContext(String userId){
 | **start_time**     | datetime | -   |  否  | NULL |     | -   |
 | **end_time**       | datetime | -   |  否  | NULL |     | -   |
 | **status**         | int      | 1   |  否  | NULL |     | -   |
-##### 索引信息 (Indexes)
+##### **meeting_member(会议成员biao)** 
+
+| 字段名 | 数据类型 | 长度 | 非空 | 默认值 | 键 | 备注 |
+| :--- | :--- | :--- | :---: | :---: | :---: | :--- |
+| **meeting_id** | varchar | 10 | 是 | - | PRI | - |
+| **user_id** | varchar | 12 | 是 | - | PRI | - |
+| **nick_name** | varchar | 20 | 否 | NULL | | - |
+| **last_join_time** | datetime | - | 否 | NULL | | - |
+| **status** | int | 1 | 否 | NULL | | - |
+| **member_type** | int | 1 | 否 | NULL | | - |
+| **meeting_status** | int | 4 | 否 | NULL | | - |
