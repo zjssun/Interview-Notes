@@ -885,3 +885,16 @@ public void closeContext(String userId){
 ### 会议室
 ##### 会议表
 #####**meeting_info**：
+
+| 字段名 | 数据类型 | 长度 | 非空 | 默认值 | 键 | 备注 |
+| :--- | :--- | :--- | :---: | :---: | :---: | :--- |
+| **meeting_id** | varchar | 10 | 是 | - | PRI | - |
+| **meeting_no** | varchar | 10 | 否 | NULL | | - |
+| **meeting_name** | varchar | 100 | 否 | NULL | | - |
+| **create_time** | datetime | - | 否 | NULL | | - |
+| **create_user_id** | varchar | 12 | 否 | NULL | | - |
+| **join_type** | int | 1 | 否 | NULL | | - |
+| **join_password** | varchar | 5 | 否 | NULL | | - |
+| **start_time** | datetime | - | 否 | NULL | | - |
+| **end_time** | datetime | - | 否 | NULL | | - |
+| **status** | int | 1 | 否 | NULL | | - |
