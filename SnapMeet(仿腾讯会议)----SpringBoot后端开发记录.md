@@ -928,3 +928,20 @@ public ResponseVO loadMeeting(Integer pageNo){
 }
 ```
 ##### MeetingInfoServiceImpl.java
+```java
+public Page<MeetingInfo> getMeetingInfoList(String userId, Integer pageNo) {  
+    Page<MeetingInfo> page = new Page<>(pageNo, 15);  
+  
+    QueryWrapper<MeetingInfo> wrapper = new QueryWrapper<>();  
+    wrapper.select(  
+            "meeting_id", "meeting_no", "meeting_name", "create_time", "create_user_id", "join_type","join_password","start_time","end_time","status",  
+            "(SELECT count(1) FROM meeting_member mm WHERE mm.meeting_id = meeting_info.meeting_id) AS memberCount"  
+    );  
+    wrapper.inSql("meeting_id",  
+            "SELECT meeting_id FROM meeting_member WHERE user_id = '" + userId + "' AND status = 1");  
+  
+    wrapper.orderByDesc("create_time");  
+    meetingInfoMapper.selectPage(page, wrapper);  
+    return page;  
+}
+```
