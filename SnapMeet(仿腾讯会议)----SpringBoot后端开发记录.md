@@ -927,3 +927,4 @@ public ResponseVO loadMeeting(Integer pageNo){
     return getSuccessResponseVO(page);  
 }
 ```
+##### MeetingInfoServiceImpl.java
