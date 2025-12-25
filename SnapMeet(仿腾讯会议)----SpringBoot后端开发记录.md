@@ -898,4 +898,4 @@ public void closeContext(String userId){
 | **start_time**     | datetime | -   |  否  | NULL |     | -   |
 | **end_time**       | datetime | -   |  否  | NULL |     | -   |
 | **status**         | int      | 1   |  否  | NULL |     | -   |
-##### 
+##### 索引信息 (Indexes)
