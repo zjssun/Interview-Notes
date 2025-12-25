@@ -918,4 +918,12 @@ public void closeContext(String userId){
 private Integer memberCount;
 ```
 ##### MeetingInfoController.java
-`/meeting/loadMeeting` 接口
+`/meeting/loadMeeting` 接口，返回结果是用户参与过的会议。
+```java
+@RequestMapping("/loadMeeting")  
+public ResponseVO loadMeeting(Integer pageNo){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    Page<MeetingInfo> page = meetingInfoServiceImpl.getMeetingInfoList(tokenUserInfoDto.getUserId(),pageNo);  
+    return getSuccessResponseVO(page);  
+}
+```
