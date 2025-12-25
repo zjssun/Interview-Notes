@@ -898,7 +898,7 @@ public void closeContext(String userId){
 | **start_time**     | datetime | -   |  否  | NULL |     | -   |
 | **end_time**       | datetime | -   |  否  | NULL |     | -   |
 | **status**         | int      | 1   |  否  | NULL |     | -   |
-##### **meeting_member(会议成员biao)** 
+##### **meeting_member(会议成员表)** 
 
 | 字段名 | 数据类型 | 长度 | 非空 | 默认值 | 键 | 备注 |
 | :--- | :--- | :--- | :---: | :---: | :---: | :--- |
@@ -909,3 +909,5 @@ public void closeContext(String userId){
 | **status** | int | 1 | 否 | NULL | | - |
 | **member_type** | int | 1 | 否 | NULL | | - |
 | **meeting_status** | int | 4 | 否 | NULL | | - |
+
+#### 
