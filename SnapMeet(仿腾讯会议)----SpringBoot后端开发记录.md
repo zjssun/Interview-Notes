@@ -912,4 +912,9 @@ public void closeContext(String userId){
 
 #### 获取用户会议历史
 ##### MeetingInfo.java
-在生成的类里加入，` ` 人数字多
+在生成的类里加入，`memberCount` 统计人数字段。
+```java
+@TableField(exist = false)  
+private Integer memberCount;
+```
+##### 
