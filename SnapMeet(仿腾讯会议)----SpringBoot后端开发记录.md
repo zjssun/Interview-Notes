@@ -928,7 +928,7 @@ public ResponseVO loadMeeting(Integer pageNo){
 }
 ```
 ##### MeetingInfoServiceImpl.java
-SQL语句分析：
+SQL语句分析：在meeting_member表中找`id=用户id` 和 `status=1` 的数据，
 ```java
 public Page<MeetingInfo> getMeetingInfoList(String userId, Integer pageNo) {  
     Page<MeetingInfo> page = new Page<>(pageNo, 15);  
