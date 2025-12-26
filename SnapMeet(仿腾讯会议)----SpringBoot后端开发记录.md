@@ -951,8 +951,9 @@ public Page<MeetingInfo> getMeetingInfoList(String userId, Integer pageNo) {
 ```
 
 ##### ABaseController.java
-
+**作用：** 接收前端header头里的"token"参数。用token来获取存在Redis里的tokenUserInfoDto内容。
 ```java
+//添加这段代码
 protected TokenUserInfoDto getTokenUserInfoDto(){  
     HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();  
     String token = request.getHeader("token");  
