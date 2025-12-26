@@ -928,7 +928,10 @@ public ResponseVO loadMeeting(Integer pageNo){
 }
 ```
 ##### MeetingInfoServiceImpl.java
-SQL语句分析：在meeting_member表中找`id=用户id` 和 `status=1` 的数据，再对比在meet_info表中的meeting_id字段与筛选出来的
+SQL语句分析：
+1. 在meeting_member表中找出`id=用户id` 和 `status=1` 的meeting_id字段的数据有哪些，再对比在meet_info表中的meeting_id字段与筛选出来的meeting_member里meeting_id字段相同的有哪些，然后把这些相同的数据列出来。
+2. 增加memberCount字段(这个是表里没有的)，查找meeting_member的meeting_id和meeting_info的meeting_id有哪些是相同的，统计相同的个数来**知道会议有多少人**。
+
 ```java
 public Page<MeetingInfo> getMeetingInfoList(String userId, Integer pageNo) {  
     Page<MeetingInfo> page = new Page<>(pageNo, 15);  
