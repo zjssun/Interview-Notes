@@ -949,3 +949,14 @@ public Page<MeetingInfo> getMeetingInfoList(String userId, Integer pageNo) {
     return page;
 }
 ```
+
+##### ABaseController.java
+
+```java
+protected TokenUserInfoDto getTokenUserInfoDto(){  
+    HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.getRequestAttributes()).getRequest();  
+    String token = request.getHeader("token");  
+    TokenUserInfoDto tokenUserInfoDto = redisComponent.getTokenUserInfoDto(token);  
+    return  tokenUserInfoDto;  
+}
+```
