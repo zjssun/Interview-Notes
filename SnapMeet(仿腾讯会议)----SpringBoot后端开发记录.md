@@ -266,6 +266,7 @@ public List<V> getZSetList(String key, Integer count) {
 }
 ```
 ---
+---
 # 登录与注册
 ### 数据库
 #### 表名：user_info (用户信息表)
@@ -456,6 +457,7 @@ public void saveTokenUserInfoDto(TokenUserInfoDto tokenUserInfoDto){
 }
 ```
 
+---
 # Netty
 ### Netty WebSocket 服务端
 Netty 服务端启动时，通常会调用 `channel().closeFuture().sync()` 来保持服务运行。**这行代码是阻塞的**，意味着程序会卡在这里一直等待，直到服务关闭。所以需要**开辟新线程**来避免阻塞主程序。
@@ -951,7 +953,7 @@ public Page<MeetingInfo> getMeetingInfoList(String userId, Integer pageNo) {
 ```
 
 ##### ABaseController.java
-**作用：** 接收前端header头里的"token"参数。用token来获取存在Redis里的tokenUserInfoDto内容。前端的token数值在
+**作用：** 接收前端header头里的"token"参数。用token来获取存在Redis里的tokenUserInfoDto内容。前端的token数值在登录时获得。
 ```java
 //添加这段代码
 protected TokenUserInfoDto getTokenUserInfoDto(){  
@@ -961,3 +963,4 @@ protected TokenUserInfoDto getTokenUserInfoDto(){
     return  tokenUserInfoDto;  
 }
 ```
+### 
