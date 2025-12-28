@@ -980,3 +980,15 @@ AOP（面向切面编程）用来进行**权限控制**例如：是否需要登�
 - **作用**：决定了这个注解的生命周期。
     
 - **`RUNTIME`**：表示这个注解在代码编译后、程序运行期间**依然存在**。
+```java
+@Target({ElementType.METHOD,ElementType.TYPE})  
+@Retention(RetentionPolicy.RUNTIME)  
+@Documented  
+@Mapping  
+public @interface GlobalInterceptor {  
+    boolean checkLogin() default true;  
+  
+    boolean checkAdmin() default false;  
+}
+```
+#### 
