@@ -964,4 +964,4 @@ protected TokenUserInfoDto getTokenUserInfoDto(){
 }
 ```
 ### AOP切面
-AOP（面向切面编程）来进行**权限控制**例如：是否需要登录、是否需要管理员权限。
+AOP（面向切面编程）用来进行**权限控制**例如：是否需要登录、是否需要管理员权限。
