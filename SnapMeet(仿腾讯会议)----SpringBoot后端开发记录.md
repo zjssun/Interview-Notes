@@ -991,4 +991,4 @@ public @interface GlobalInterceptor {
     boolean checkAdmin() default false;  
 }
 ```
-#### 
+#### GlobalOperationAspect.java
