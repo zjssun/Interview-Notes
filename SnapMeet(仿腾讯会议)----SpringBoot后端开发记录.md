@@ -965,3 +965,6 @@ protected TokenUserInfoDto getTokenUserInfoDto(){
 ```
 ### AOP切面
 AOP（面向切面编程）用来进行**权限控制**例如：是否需要登录、是否需要管理员权限。
+#### GlobalInterceptor.java
+这段代码定义了一个 **自定义注解 (Custom Annotation)**，名为 `@GlobalInterceptor`。
+
