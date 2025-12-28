@@ -1008,3 +1008,40 @@ Method method = ((MethodSignature)point.getSignature()).getMethod();
 GlobalInterceptor interceptor = method.getAnnotation(GlobalInterceptor.class);
 ```
 **反射机制：**
+- 通过 `point` 拿到当前正要执行的方法对象。
+    
+- 通过 `method.getAnnotation` 拿到方法头上那个 `@GlobalInterceptor` 注解的实例。
+    
+- 这样就能读取你在 Controller 上配置的参数了（比如 `checkAdmin=true`）。
+##### 4. 判断逻辑
+```java
+if(interceptor.checkLogin() || interceptor.checkAdmin()){ 
+	checkLogin(interceptor.checkAdmin()); 
+}
+```
+- 如果注解配置了需要校验登录（默认 true）**或者**需要校验管理员权限，就调用 `checkLogin` 方法。
+##### 5. 核心校验逻辑
+```java
+private void checkLogin(Boolean checkAdmin){
+    // 1. 获取当前 HTTP 请求
+    HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+    
+    // 2. 拿 Token
+    String token = request.getHeader("token");
+    
+    // 3. 查 Redis 验真伪
+    TokenUserInfoDto tokenUserInfoDto = redisComponent.getTokenUserInfoDto(token);
+    
+    // 4. 校验是否登录
+    if(tokenUserInfoDto == null){
+        // 抛出自定义异常：901 未登录
+        throw new BusinessException(ResponseCodeEnum.CODE_901);
+    }
+    
+    // 5. 校验是否是管理员 (如果注解要求查的话)
+    if(checkAdmin && !tokenUserInfoDto.getAdmin()){
+        // 抛出自定义异常：600 无权限
+        throw new BusinessException(ResponseCodeEnum.CODE_600);
+    }
+}
+```
