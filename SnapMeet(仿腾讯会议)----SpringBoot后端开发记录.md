@@ -999,3 +999,12 @@ public @interface GlobalInterceptor {
 ```java
 @Before("@annotation(com.snapmeet.annotation.GlobalInterceptor)")
 ```
+**`@Before`**: 表示**前置通知**。意思是在目标方法执行**之前**，先运行这段代码。
+`@GlobalInterceptor` 这个标签，我就拦截它。
+**`@annotation(...)`**: 这是切点表达式。它的意思是：只要某个方法上打了
+##### 2.获取注解配置
+```java
+Method method = ((MethodSignature)point.getSignature()).getMethod();
+GlobalInterceptor interceptor = method.getAnnotation(GlobalInterceptor.class);
+```
+**反射机制：**
