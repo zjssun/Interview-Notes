@@ -992,3 +992,5 @@ public @interface GlobalInterceptor {
 }
 ```
 #### GlobalOperationAspect.java
+这段代码是 **AOP（面向切面编程）** 的具体实现。
+它的作用是：**在执行 Controller 的业务方法之前，自动拦截请求，进行“登录校验”和“管理员权限校验”**。
