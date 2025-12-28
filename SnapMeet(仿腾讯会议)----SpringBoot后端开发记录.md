@@ -1088,3 +1088,9 @@ public void qucikMeeting(MeetingInfo meetingInfo, String nickName) {
     this.save(meetingInfo);  
 }
 ```
+#### ABaseController.java
+```java
+protected void resetTokenUserInfo(TokenUserInfoDto tokenUserInfoDto){  
+    redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);  
+}
+```
