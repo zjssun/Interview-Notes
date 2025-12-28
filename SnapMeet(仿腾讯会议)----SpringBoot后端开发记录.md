@@ -986,8 +986,9 @@ protected TokenUserInfoDto getTokenUserInfoDto(){
 @Documented  
 @Mapping  
 public @interface GlobalInterceptor {  
+	//是否校验登录
     boolean checkLogin() default true;  
-  
+    //是否校验管理员身份
     boolean checkAdmin() default false;  
 }
 ```
