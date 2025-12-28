@@ -1046,3 +1046,45 @@ private void checkLogin(Boolean checkAdmin){
 }
 ```
 ### 创建会议信息
+#### MeetingInfoController.java
+1. 前端传入 会议类型、会议名字、是否有密码和会议密码。
+2. 通过之前在ABaseController写的`getTokenUserInfoDto()` 获取token信息，如果token记录了会议的id，则说明有进行的会议未结束。
+3. 把需要记录的信息写到meetingInfo里并保存到数据库，然后通过 `resetTokenUserInfo()` 方法更新现有的token到Redis。
+4. 把**会议的ID号**返回给前端。
+```java
+@RequestMapping("/quickMeeting")  
+@GlobalInterceptor  
+public ResponseVO quickMeeting(@NotNull Integer meetingNoType,  
+                               @NotEmpty @Size(max = 100) String meetingName,  
+                               @NotNull Integer joinType, @Max(5) String joinPassword){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    if(tokenUserInfoDto.getCurrentMeetingId() != null){  
+        throw new BusinessException("你有未结束的会议,无法创建新的会议");  
+    }  
+    MeetingInfo meetingInfo = new  MeetingInfo();  
+    meetingInfo.setMeetingName(meetingName);  
+    meetingInfo.setMeetingNo(meetingNoType==0?tokenUserInfoDto.getMyMeetingNo(): StringTools.getMeetingNoOrMeetingId());  
+    meetingInfo.setJoinType(joinType);  
+    meetingInfo.setJoinPassword(joinPassword);  
+    meetingInfo.setCreateUserId(tokenUserInfoDto.getUserId());  
+    meetingInfoService.qucikMeeting(meetingInfo,tokenUserInfoDto.getNickName());  
+  
+    tokenUserInfoDto.setCurrentMeetingId(meetingInfo.getMeetingId());  
+    tokenUserInfoDto.setCurrentNickName(tokenUserInfoDto.getNickName());  
+    resetTokenUserInfo(tokenUserInfoDto);  
+    return getSuccessResponseVO(meetingInfo.getMeetingId());  
+}
+```
+
+#### MeetingInfoServiceImpl.java
+```java
+@Override  
+public void qucikMeeting(MeetingInfo meetingInfo, String nickName) {  
+    LocalDateTime curDate = LocalDateTime.now();  
+    meetingInfo.setCreateTime(curDate);  
+    meetingInfo.setMeetingId(StringTools.getMeetingNoOrMeetingId());  
+    meetingInfo.setStartTime(curDate);  
+    meetingInfo.setStatus(MeetingStatusEnum.RUNING.getStatus());  
+    this.save(meetingInfo);  
+}
+```
