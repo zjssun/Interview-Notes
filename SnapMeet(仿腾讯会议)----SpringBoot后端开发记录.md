@@ -1094,3 +1094,6 @@ protected void resetTokenUserInfo(TokenUserInfoDto tokenUserInfoDto){
     redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);  
 }
 ```
+
+### 加入会议
+
