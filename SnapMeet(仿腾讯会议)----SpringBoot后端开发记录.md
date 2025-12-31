@@ -1165,3 +1165,4 @@ if(meetingInfo == null || MeetingStatusEnum.FINISHED.getStatus().equals(meetingI
     throw new BusinessException(ResponseCodeEnum.CODE_600);  
 }
 ```
+校验用户是否为黑名单，保存用户到`MeetingMember` 数据库表，
