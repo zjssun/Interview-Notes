@@ -1155,3 +1155,13 @@ private void checkMeetingJoin(String meetingId,String userId){
 }
 ```
 #### `joinMeeting` (主流程)
+判断id是否为空，判断会议状态，如果状态为结束，抛出异常。
+```java
+if(StringTools.isEmpty(meetingId)){  
+    throw new BusinessException(ResponseCodeEnum.CODE_600);  
+}  
+MeetingInfo meetingInfo = this.getOne(new LambdaQueryWrapper<MeetingInfo>().eq(MeetingInfo::getMeetingId, meetingId));  
+if(meetingInfo == null || MeetingStatusEnum.FINISHED.getStatus().equals(meetingInfo.getStatus())){  
+    throw new BusinessException(ResponseCodeEnum.CODE_600);  
+}
+```
