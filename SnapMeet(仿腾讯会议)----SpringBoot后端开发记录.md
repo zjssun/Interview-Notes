@@ -1154,4 +1154,4 @@ private void checkMeetingJoin(String meetingId,String userId){
     }  
 }
 ```
-#### 
+#### `joinMeeting` (主流程)
