@@ -1109,4 +1109,19 @@ public ResponseVO joinMeeting(@NotNull Boolean videOpen){
 ```
 #### 辅助方法 (MeetingInfoServiceImpl.java)
 ##### addMeetingMember
-保存用户信息到`MeetingMember` 数据库表
+保存用户信息到`MeetingMember` 数据库表。
+- 
+```java
+private void addMeetingMember(String meetingId,String userId,String nickName,Integer memberType){  
+    MeetingMember meetingMember = new MeetingMember();  
+    meetingMember.setMeetingId(meetingId);  
+    meetingMember.setUserId(userId);  
+    meetingMember.setNickName(nickName);  
+    LocalDateTime localDateTime = LocalDateTime.now();  
+    meetingMember.setLastJoinTime(localDateTime);  
+    meetingMember.setStatus(MeetingMemberStatusEnum.NORMAL.getStatus());  
+    meetingMember.setMemberType(memberType);  
+    meetingMember.setMeetingStatus(MeetingStatusEnum.RUNING.getStatus());  
+    meetingMemberService.insertOrUpdate(meetingMember);  
+}
+```
