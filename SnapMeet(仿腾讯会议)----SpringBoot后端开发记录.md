@@ -1096,6 +1096,7 @@ protected void resetTokenUserInfo(TokenUserInfoDto tokenUserInfoDto){
 ```
 
 ### 加入会议
+#### MeetingInfoController.java
 接口`/meeting/joinMeeting` 参数：要加入的会议Id、用户Id、用户昵称、用户性别、是否打开摄像头。
 ```java
 @RequestMapping("/joinMeeting")  
@@ -1106,3 +1107,4 @@ public ResponseVO joinMeeting(@NotNull Boolean videOpen){
     return  getSuccessResponseVO(null);  
 }
 ```
+#### 辅助方法 (MeetingInfoServiceImpl.java)
