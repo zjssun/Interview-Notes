@@ -1110,7 +1110,10 @@ public ResponseVO joinMeeting(@NotNull Boolean videOpen){
 #### 辅助方法 (MeetingInfoServiceImpl.java)
 ##### addMeetingMember
 保存用户信息到`MeetingMember` 数据库表。
-- 
+**关键点**：使用 `insertOrUpdate`。
+- 如果是第一次加入，插入一条新记录。
+    
+- 如果用户掉线后重连，或者退出后再进，只是更新“最后加入时间”和状态，避免产生脏数据。
 ```java
 private void addMeetingMember(String meetingId,String userId,String nickName,Integer memberType){  
     MeetingMember meetingMember = new MeetingMember();  
