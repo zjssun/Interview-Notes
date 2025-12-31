@@ -1165,4 +1165,30 @@ if(meetingInfo == null || MeetingStatusEnum.FINISHED.getStatus().equals(meetingI
     throw new BusinessException(ResponseCodeEnum.CODE_600);  
 }
 ```
-校验用户是否为黑名单，保存用户到`MeetingMember` 数据库表，
+校验用户是否为黑名单，保存用户加入会议信息到`MeetingMember` 表，保存用户加入会议信息到Redis。
+```java
+//校验用户  
+checkMeetingJoin(meetingId,userId);  
+//加入成员  
+MemberTypeEnum memberTypeEnum = meetingInfo.getCreateUserId().equals(userId) ? MemberTypeEnum.COMPERE : MemberTypeEnum.NORMAL;  
+addMeetingMember(meetingId,userId,nickName,memberTypeEnum.getType());  
+//加入会议  
+add2Meeting(meetingId,userId,nickName,sex,memberTypeEnum.getType(),videoOpen);
+```
+建立 WebSocket 关联,获取最新的全员列表和新进来的这个人信息，封装消息包，执行群发。
+```java
+//加入ws 房间  
+channelContextUtils.addMeetingRoom(meetingId,userId);  
+//发送ws消息  
+MeetingJoinDto meetingJoinDto = new MeetingJoinDto();  
+meetingJoinDto.setMeetingMemberList(redisComponent.getMeetingMemberList(meetingId));  
+meetingJoinDto.setNewMember(redisComponent.getMeetingMember(meetingId,userId));  
+  
+MessageSendDto messageSendDto = new MessageSendDto();  
+messageSendDto.setMessageType(MessageTypeEnum.ADD_MEETING_ROOM.getType());  
+messageSendDto.setMeetingId(meetingId);  
+messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.GROUP.getType());  
+messageSendDto.setMessageContent(meetingJoinDto);  
+channelContextUtils.sendMessage(messageSendDto);
+```
+### 
