@@ -1096,4 +1096,13 @@ protected void resetTokenUserInfo(TokenUserInfoDto tokenUserInfoDto){
 ```
 
 ### 加入会议
-
+接口`/meeting/joinMeeting` 
+```java
+@RequestMapping("/joinMeeting")  
+@GlobalInterceptor  
+public ResponseVO joinMeeting(@NotNull Boolean videOpen){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    meetingInfoService.joinMeeting(tokenUserInfoDto.getCurrentMeetingId(),tokenUserInfoDto.getUserId(),tokenUserInfoDto.getNickName(),tokenUserInfoDto.getSex(),videOpen);  
+    return  getSuccessResponseVO(null);  
+}
+```
