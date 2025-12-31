@@ -1128,3 +1128,30 @@ private void addMeetingMember(String meetingId,String userId,String nickName,Int
     meetingMemberService.insertOrUpdate(meetingMember);  
 }
 ```
+##### add2Meeting
+将成员信息存入 Redis。前端展示“参会人员墙”时，通常直接读 Redis，而不是查数据库。
+```java
+private void add2Meeting(String meetingId,String userId,String nickName,Integer sex,Integer memberType,Boolean videoOpen){  
+    MeetingMemberDTO meetingMemberDTO = new MeetingMemberDTO();  
+    LocalDateTime localDateTime = LocalDateTime.now();  
+    meetingMemberDTO.setUserId(userId)  
+            .setNickName(nickName)  
+            .setJoinTime(localDateTime)  
+            .setSex(sex)  
+            .setMemberType(memberType)  
+            .setVideoOpen(videoOpen)  
+            .setStatus(MeetingMemberStatusEnum.NORMAL.getStatus());  
+    redisComponent.add2Meeting(meetingId,meetingMemberDTO);  
+}
+```
+##### checkMeetingJoin
+防止被拉黑的用户再次进入。去 Redis 查这个人在这个会议里的状态，如果是 `BLACKLIST`，直接抛异常阻断流程。
+```java
+private void checkMeetingJoin(String meetingId,String userId){  
+    MeetingMemberDTO meetingMemberDTO = redisComponent.getMeetingMember(meetingId,userId);  
+    if(meetingMemberDTO!=null&&MeetingMemberStatusEnum.BLACKLIST.getStatus().equals(meetingMemberDTO.getStatus())){  
+        throw new BusinessException("你已经被拉黑无法加入会议");  
+    }  
+}
+```
+#### 
