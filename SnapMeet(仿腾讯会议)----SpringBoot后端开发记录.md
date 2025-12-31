@@ -1108,3 +1108,5 @@ public ResponseVO joinMeeting(@NotNull Boolean videOpen){
 }
 ```
 #### 辅助方法 (MeetingInfoServiceImpl.java)
+##### addMeetingMember
+保存用户信息到`MeetingMember` 数据库表
