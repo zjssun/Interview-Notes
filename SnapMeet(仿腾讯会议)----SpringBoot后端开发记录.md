@@ -1191,4 +1191,4 @@ messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.GROUP.getType());
 messageSendDto.setMessageContent(meetingJoinDto);  
 channelContextUtils.sendMessage(messageSendDto);
 ```
-### 
+### 入会前判断
