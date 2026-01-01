@@ -1192,3 +1192,45 @@ messageSendDto.setMessageContent(meetingJoinDto);
 channelContextUtils.sendMessage(messageSendDto);
 ```
 ### 入会前判断
+- **用户输入**：会议号 9527，密码 123456。
+    
+- **系统查询**：找会议号 9527 且正在进行的会议。 -> **没找到**？报错“会议不存在”。
+    
+- **系统检查**：用户当前是否正在开别的会？ -> **是**？报错“你有未结束的会议”。
+    
+- **系统检查**：用户是否被拉黑？ -> **是**？报错“无法加入”。
+    
+- **系统检查**：会议需要密码吗？ -> **需要** -> 密码对不对？ -> **不对**？报错“密码错误”。
+    
+- **状态锁定**：在 Redis 里标记该用户“正在参加会议 X”。
+    
+- **通行**：返回会议 ID，允许前端进行下一步 WebSocket 连接。
+```java
+@Override  
+public String preJoinMeeting(String meetingNo, TokenUserInfoDto tokenUserInfoDto, String password) {  
+    String userId = tokenUserInfoDto.getUserId();  
+    LambdaQueryWrapper<MeetingInfo> wrapper = new LambdaQueryWrapper<>();  
+    wrapper.eq(MeetingInfo::getMeetingNo, meetingNo)  
+            .eq(MeetingInfo::getStatus, MeetingStatusEnum.RUNING.getStatus())  
+            .orderByDesc(MeetingInfo::getCreateTime);  
+    List<MeetingInfo> meetingInfoList = this.list(wrapper);  
+    if(meetingInfoList.isEmpty()){  
+        throw new BusinessException("会议不存在");  
+    }  
+    MeetingInfo meetingInfo = meetingInfoList.get(0);  
+    if(!MeetingStatusEnum.RUNING.getStatus().equals(meetingInfo.getStatus())){  
+        throw  new BusinessException("会议结束");  
+    }  
+    if(!StringTools.isEmpty(tokenUserInfoDto.getCurrentMeetingId())&&!meetingInfo.getMeetingId().equals(tokenUserInfoDto.getCurrentMeetingId())){  
+        throw  new BusinessException("你有未结束的会议");  
+    }  
+    checkMeetingJoin(meetingInfo.getMeetingId(),userId);  
+    if(MeetingJoinTypeEnum.PASSWORD.getType().equals(meetingInfo.getJoinType()) && !meetingInfo.getJoinPassword().equals(password)){  
+        throw new BusinessException("入会密码不正确");  
+    }  
+  
+    tokenUserInfoDto.setCurrentMeetingId(meetingInfo.getMeetingId());  
+    redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);  
+    return meetingInfo.getMeetingId();  
+}
+```
