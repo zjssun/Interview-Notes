@@ -1252,3 +1252,8 @@ channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
 ```java
 String queueName = channel.queueDeclare().getQueue();
 ```
+- **含义**：创建一个 **匿名、排他、自动删除** 的队列。
+```java
+channel.queueBind(queueName, EXCHANGE_NAME, "")
+```
+- 将这个临时队列绑定到广播交换机上。
