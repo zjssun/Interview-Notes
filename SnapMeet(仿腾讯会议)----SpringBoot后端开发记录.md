@@ -1237,3 +1237,9 @@ public String preJoinMeeting(String meetingNo, TokenUserInfoDto tokenUserInfoDto
 ```
 ### RabbitMQ实现消息的订阅发布
 
+实现一个 **基于 RabbitMQ 的消息处理组件**。这个类就是利用 RabbitMQ 的 **广播机制** 来实现这种跨服务器的消息同步。
+
+```java
+@ConditionalOnProperty(name = Constants.MESSAGEING_HANDLE_CHANNEL_KEY, havingValue = Constants.MESSAGEING_HANDLE_CHANNEL_RABBITMQ)
+```
+- **`@ConditionalOnProperty`**: 这是一个开关。只有当配置文件中 `Constants.MESSAGEING_HANDLE_CHANNEL_KEY` 的值等于 "rabbitmq" 时，Spring 才会加载这个类。这意味着系统可能支持多种消息中间件（比如 Redis 或 Kafka），可以通过配置灵活切换。
