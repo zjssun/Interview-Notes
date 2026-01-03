@@ -1308,6 +1308,7 @@ if (retryCount < MAX_RETRYTIME) {
 ```java
 public void sendMessage(MessageSendDto messageSendDto) {  
     try(Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {  
+	    // 建一个交换机，模式是：无差别广播
         channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);  
         String message = JSON.toJSONString(messageSendDto);  
         channel.basicPublish(EXCHANGE_NAME,"",null,message.getBytes());  
