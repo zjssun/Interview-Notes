@@ -1311,6 +1311,7 @@ public void sendMessage(MessageSendDto messageSendDto) {
 	    // 建一个交换机，模式是：无差别广播
         channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);  
         String message = JSON.toJSONString(messageSendDto);  
+        //RabbitMQ 收到你的 Publish 后，会立刻把消息复制到所有绑定了这个 Exchange 的 Queue 里。
         channel.basicPublish(EXCHANGE_NAME,"",null,message.getBytes());  
     }catch (Exception e){  
         log.error("rabbitmq发送消息失败");  
