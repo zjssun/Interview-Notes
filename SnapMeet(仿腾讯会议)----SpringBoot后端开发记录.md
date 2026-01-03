@@ -1282,3 +1282,37 @@ DeliverCallback deliverCallback = (consumerTag, dellivery) -> {
 };
 ```
 - **手动 ACK**: `autoAck = false` 配合 `channel.basicAck`。这是为了保证数据不丢失。只有代码确认处理成功了，RabbitMQ 才会从队列中删除这条消息。
+```java
+// 1. 从消息头中获取已重试次数
+Map<String, Object> headers = delivery.getProperties().getHeaders();
+Integer retryCount = (Integer) headers.get(RETRY_COUNT_KEY);
+
+// 2. 判断是否超过最大重试次数 (3次)
+if (retryCount < MAX_RETRYTIME) {
+    // 3. 次数 +1 并写回 Header
+    headers.put(RETRY_COUNT_KEY, retryCount + 1);
+    // 4. 【关键】重新发布消息到队列末尾
+    // 注意：这里用的是默认交换机 ("")，直接指定 queueName，实现了“点对点”的重回队列
+    channel.basicPublish("", queueName, properties, delivery.getBody());
+    // 5. 确认掉旧的那条失败消息
+    channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+} else {
+    // 6. 超过次数，彻底放弃 (拒绝消息且不重回队列)
+    channel.basicReject(delivery.getEnvelope().getDeliveryTag(), false);
+}
+```
+这是一个**手写的本地重试机制**。
+- **逻辑**：如果处理失败，它不会让消息直接卡在队首（导致死循环），而是把消息取出来，计数器+1，然后重新排队到队尾。
+    
+- **优点**：简单有效，不会阻塞后续消息的处理。
+```java
+public void sendMessage(MessageSendDto messageSendDto) {  
+    try(Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {  
+        channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);  
+        String message = JSON.toJSONString(messageSendDto);  
+        channel.basicPublish(EXCHANGE_NAME,"",null,message.getBytes());  
+    }catch (Exception e){  
+        log.error("rabbitmq发送消息失败");  
+    }  
+}
+```
