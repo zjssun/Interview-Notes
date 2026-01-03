@@ -884,6 +884,7 @@ public void closeContext(String userId){
 }
 ```
 
+# 会议
 ### 会议室
 #### 需要用到的数据库表
 ##### **meeting_info(会议信息表)**：
@@ -1234,3 +1235,5 @@ public String preJoinMeeting(String meetingNo, TokenUserInfoDto tokenUserInfoDto
     return meetingInfo.getMeetingId();  
 }
 ```
+### RabbitMQ实现消息的订阅发布
+
