@@ -1249,3 +1249,6 @@ channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
 - 这里使用了 **`FANOUT` (扇型)** 交换机。
     
 - **作用**：广播。无论消息发给谁，只要绑定到这个交换机的队列，都会收到一份完整的拷贝。这是实现“群发”或“多服务器同步”的关键。
+```java
+String queueName = channel.queueDeclare().getQueue();
+```
