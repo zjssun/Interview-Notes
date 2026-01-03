@@ -1244,6 +1244,14 @@ public String preJoinMeeting(String meetingNo, TokenUserInfoDto tokenUserInfoDto
 ```
 - **`@ConditionalOnProperty`**: 这是一个开关。只有当配置文件中 `Constants.MESSAGEING_HANDLE_CHANNEL_KEY` 的值等于 "rabbitmq" 时，Spring 才会加载这个类。这意味着系统可能支持多种消息中间件（比如 Redis 或 Kafka），可以通过配置灵活切换。
 ```java
+private ConnectionFactory factory;  
+private Connection connection;  
+private Channel channel;
+factory = new ConnectionFactory();  
+factory.setHost(host);  
+factory.setPort(port);
+connection = factory.newConnection();  
+channel = connection.createChannel();
 channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
 ```
 - 这里使用了 **`FANOUT` (扇型)** 交换机。
@@ -1257,3 +1265,20 @@ String queueName = channel.queueDeclare().getQueue();
 channel.queueBind(queueName, EXCHANGE_NAME, "")
 ```
 - 将这个临时队列绑定到广播交换机上。
+```java
+Boolean autoAck = false; // 关闭自动确认
+DeliverCallback deliverCallback = (consumerTag, dellivery) -> {
+    try {
+        // 1. 解析消息
+        String message = new String(dellivery.getBody(), "UTF-8");
+        // 2. 将消息分发给 WebSocket 客户端
+        channelContextUtils.sendMessage(JSON.parseObject(message, MessageSendDto.class));
+        // 3. 成功后，发送确认回执 (ACK)
+        channel.basicAck(dellivery.getEnvelope().getDeliveryTag(), false);
+    } catch (Exception e) {
+        // 4. 失败处理 (进入重试逻辑)
+        handleFailMessage(channel, dellivery, queueName);
+    }
+};
+```
+- **手动 ACK**: `autoAck = false` 配合 `channel.basicAck`。这是为了保证数据不丢失。只有代码确认处理成功了，RabbitMQ 才会从队列中删除这条消息。
