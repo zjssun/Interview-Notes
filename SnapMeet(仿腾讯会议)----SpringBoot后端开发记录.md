@@ -1244,10 +1244,8 @@ public String preJoinMeeting(String meetingNo, TokenUserInfoDto tokenUserInfoDto
 ```
 - **`@ConditionalOnProperty`**: 这是一个开关。只有当配置文件中 `Constants.MESSAGEING_HANDLE_CHANNEL_KEY` 的值等于 "rabbitmq" 时，Spring 才会加载这个类。这意味着系统可能支持多种消息中间件（比如 Redis 或 Kafka），可以通过配置灵活切换。
 ```java
-private ConnectionFactory factory;  
-private Connection connection;  
-private Channel channel;
-connection = factory.newConnection();  
-channel = connection.createChannel();
 channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.FANOUT);
 ```
+- 这里使用了 **`FANOUT` (扇型)** 交换机。
+    
+- **作用**：广播。无论消息发给谁，只要绑定到这个交换机的队列，都会收到一份完整的拷贝。这是实现“群发”或“多服务器同步”的关键。
