@@ -1377,4 +1377,4 @@ public ResponseVO exitMeeting(){
 #### MeetingInfoServiceImpl.java
 **整体业务流程**:
 1. **验票：** 检查当前用户的 Token，看他是否记录了正在参加某个会议 (`meetingId`)。如果没在开会，直接忽略。
-2. **退场：** 
+2. **退场：** 尝试在 Redis 的“当前参会人员名单”中把这个人划掉。如果 Redis 里没划掉，那就只把用户自己的状态重置为空闲，然后直接结束流程（不发通知）。
