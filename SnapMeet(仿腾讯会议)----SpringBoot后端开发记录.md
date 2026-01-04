@@ -1323,3 +1323,5 @@ public void sendMessage(MessageSendDto messageSendDto) {
 发送消息
 
 ### 发送preConnection信息
+这段代码是一个 **Netty WebSocket 消息处理器**(HandlerWebSocket.java) 的核心部分，专门用于处理 **WebRTC 信令转发** 或 **端对端（Peer-to-Peer）数据转发**。
+主要作用是：**“收信 -> 验身 -> 改包 -> 转发”**。也就是接收客户端发来的信令数据，验证身份后，重新包装成内部消息格式，再转发给目标用户。
