@@ -1363,4 +1363,15 @@ messageSendDto.setSendUserId(tokenUserInfoDto.getUserId()); // 标记是谁发�
 messageHandler.sendMessage(messageSendDto);
 ```
 最后调用之前写的 `MessageHandler`，将消息投递出去。
-### 
+### 退出会议
+#### MeetingInfoController.java
+```java
+@RequestMapping("/existMeeting")  
+@GlobalInterceptor  
+public ResponseVO exitMeeting(){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    meetingInfoService.exitMeetingRoom(tokenUserInfoDto, MeetingMemberStatusEnum.EXIT_MEETING);  
+    return getSuccessResponseVO(null);  
+}
+```
+#### MeetingInfoServiceImpl.java
