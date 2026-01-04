@@ -1359,3 +1359,8 @@ messageSendDto.setMeetingId(tokenUserInfoDto.getCurrentMeetingId()); // 绑定�
 messageSendDto.setSendUserId(tokenUserInfoDto.getUserId()); // 标记是谁发的
 ```
 这里做了一个**格式转换**：从前端的 `PeerConnectionDataDto` 转成了后端的通用传输格式 `MessageSendDto`。
+```java
+messageHandler.sendMessage(messageSendDto);
+```
+最后调用之前写的 `MessageHandler`，将消息投递出去。
+### 
