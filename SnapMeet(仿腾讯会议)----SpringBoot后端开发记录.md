@@ -1325,3 +1325,37 @@ public void sendMessage(MessageSendDto messageSendDto) {
 ### 发送preConnection信息
 这段代码是一个 **Netty WebSocket 消息处理器**(HandlerWebSocket.java) 的核心部分，专门用于处理 **WebRTC 信令转发** 或 **端对端（Peer-to-Peer）数据转发**。
 主要作用是：**“收信 -> 验身 -> 改包 -> 转发”**。也就是接收客户端发来的信令数据，验证身份后，重新包装成内部消息格式，再转发给目标用户。
+```java
+@Override
+protected void channelRead0(ChannelHandlerContext channelHandlerContext, TextWebSocketFrame textWebSocketFrame) throws Exception {
+    String text = textWebSocketFrame.text(); // 获取 WebSocket 帧里的文本内容
+```
+- **`TextWebSocketFrame`**: Netty 专门处理 WebSocket 文本帧的对象。
+    
+- **`channelRead0`**: `SimpleChannelInboundHandler` 的标准回调方法，每当有数据进来时触发。
+```java
+// 反序列化：将 JSON 字符串转为 Java 对象 
+PeerConnectionDataDto peerConnectionDataDto = JSON.parseObject(text, PeerConnectionDataDto.class);
+```
+**`PeerConnectionDataDto`**: 这是**前端传过来的数据格式**。看名字推测包含：
+
+- `token`: 身份凭证。
+    
+- `signalData` / `signalType`: WebRTC 的 SDP 或 ICE Candidate 数据。
+    
+- `targetUserId`: 想发给谁？。
+```java
+MessageSendDto messageSendDto = new MessageSendDto();
+messageSendDto.setMessageType(MessageTypeEnum.PEER.getType()); // 标记类型：这是给 Peer 的
+
+// 提取核心业务数据（WebRTC 信令）
+PeerMessageDto peerMessageDto = new PeerMessageDto();
+peerMessageDto.setSignalData(peerConnectionDataDto.getSignalData());
+peerMessageDto.setSignalType(peerConnectionDataDto.getSignalType());
+
+// 填充元数据
+messageSendDto.setMessageContent(peerMessageDto); // 内容载荷
+messageSendDto.setMeetingId(tokenUserInfoDto.getCurrentMeetingId()); // 绑定会议室
+messageSendDto.setSendUserId(tokenUserInfoDto.getUserId()); // 标记是谁发的
+```
+这里做了一个**格式转换**：从前端的 `PeerConnectionDataDto` 转成了后端的通用传输格式 `MessageSendDto`。
