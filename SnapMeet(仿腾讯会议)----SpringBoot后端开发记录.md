@@ -1280,6 +1280,8 @@ DeliverCallback deliverCallback = (consumerTag, dellivery) -> {
         handleFailMessage(channel, dellivery, queueName);
     }
 };
+//启动监听
+channel.basicConsume(queueName,autoAck,deliverCallback,consumeTag->{});
 ```
 - **手动 ACK**: `autoAck = false` 配合 `channel.basicAck`。这是为了保证数据不丢失。只有代码确认处理成功了，RabbitMQ 才会从队列中删除这条消息。
 ```java
