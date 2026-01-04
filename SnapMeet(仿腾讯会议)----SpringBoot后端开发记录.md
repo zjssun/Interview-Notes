@@ -1322,4 +1322,4 @@ public void sendMessage(MessageSendDto messageSendDto) {
 ```
 发送消息
 
-###
+### 发送preConnection信息
