@@ -1375,3 +1375,6 @@ public ResponseVO exitMeeting(){
 }
 ```
 #### MeetingInfoServiceImpl.java
+**整体业务流程**:
+1. **验票：** 检查当前用户的 Token，看他是否记录了正在参加某个会议 (`meetingId`)。如果没在开会，直接忽略。
+2. **退场：** 
