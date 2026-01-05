@@ -1499,4 +1499,47 @@ private void removeContextFromGroup(String userId, String meetingId){
 ```
 **注意**：`group.remove(context)` 只是把连接从组里拿出来，**并不会关闭用户的 WebSocket 连接**。用户依然保持着与服务器的连接（可以接收系统通知或其他消息），只是不再接收这个会议室的消息了。
 ### 拉黑+踢出会议+结束会议
+#### MeetingInfoController.java
+```java
+// 踢出会议
+@RequestMapping("KickOutMeeting")  
+@GlobalInterceptor  
+public ResponseVO kickOutMeeting(@NotEmpty String userId){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    meetingInfoService.forceExitMeeting(tokenUserInfoDto,userId,MeetingMemberStatusEnum.KICK_OUT);  
+    return getSuccessResponseVO(null);  
+}  
 
+// 黑名单
+@RequestMapping("blackMeeting")  
+@GlobalInterceptor  
+public ResponseVO blackMeeting(@NotEmpty String userId){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    meetingInfoService.forceExitMeeting(tokenUserInfoDto,userId,MeetingMemberStatusEnum.KICK_OUT);  
+    return getSuccessResponseVO(null);  
+}  
+  
+//获取当前正在进行的会议  
+@RequestMapping("/getCurrentMeeting")  
+@GlobalInterceptor  
+public ResponseVO getCurrentMeeting(){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    if(StringTools.isEmpty(tokenUserInfoDto.getCurrentMeetingId())){  
+        return getSuccessResponseVO(null);  
+    }  
+    MeetingInfo meetingInfo = this.meetingInfoService.getMeetingInfoListByMeetingId(tokenUserInfoDto.getCurrentMeetingId());  
+    if(MeetingStatusEnum.FINISHED.getStatus().equals(meetingInfo.getStatus())){  
+        return  getSuccessResponseVO(null);  
+    }  
+    return   getSuccessResponseVO(meetingInfo);  
+}  
+  
+//结束会议  
+@RequestMapping("/fishMeeting")  
+@GlobalInterceptor  
+public ResponseVO fishMeeting(){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    meetingInfoService.finishMeeting(tokenUserInfoDto.getCurrentMeetingId(),tokenUserInfoDto.getUserId());  
+    return getSuccessResponseVO(null);  
+}
+```
