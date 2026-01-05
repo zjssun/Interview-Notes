@@ -1543,3 +1543,4 @@ public ResponseVO fishMeeting(){
     return getSuccessResponseVO(null);  
 }
 ```
+#### MeetingInfoServiceImpl.java
