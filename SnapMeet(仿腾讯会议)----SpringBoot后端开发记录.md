@@ -1476,3 +1476,25 @@ if(MessageTypeEnum.FINISH_MEETING.getType().equals(messageSendDto.getMessageType
     removeContextGroup(messageSendDto.getMeetingId());
 }
 ```
+##### 辅助函数解析
+```java
+private void removeContextGroup(String meetingId){ MEETING_ROOM_CONTEXT_MAP.remove(meetingId); }
+```
+**作用**：从全局 Map 中直接删除这个 key。这样以后再有消息发往这个 `meetingId`，系统就会发现找不到 Group，从而避免错误投递。
+```java
+private void removeContextFromGroup(String userId, String meetingId){
+    // 1. 先找到这个人的物理连接
+    Channel context = USER_CONTEXT_MAP.get(userId);
+    if(null == context){
+        return; // 如果人已经断线了，Map里没他，就不用处理了
+    }
+    
+    // 2. 找到会议室的广播组
+    ChannelGroup group = MEETING_ROOM_CONTEXT_MAP.get(meetingId);
+    if(group != null){
+        // 3. 【关键】从组里删除这个连接
+        group.remove(context);
+    }
+}
+```
+**注意**：`group.remove(context)` 只是把连接从组里拿出来，**并不会关闭用户的 WebSocket 连接**。用户依然保持着与服务器的连接（可以接收系统通知或其他消息），只是不再接收这个会议室的消息了。
