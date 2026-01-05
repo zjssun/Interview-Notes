@@ -1438,3 +1438,4 @@ public void exitMeetingRoom(TokenUserInfoDto tokenUserInfoDto, MeetingMemberStat
 2. **`MEETING_ROOM_CONTEXT_MAP`**: 会议 ID -> 会议室广播组 (ChannelGroup)
 这段代码的作用是：当**有人退出会议**或者**会议彻底结束**时，及时更新这两个 Map，把人从广播组里踢出去，或者直接销毁整个广播组，**防止内存泄漏和消息误发**。
 
+##### 场景 1：单人退出会议 (`EXIT_MEETING_ROOM`)
