@@ -1383,5 +1383,58 @@ public ResponseVO exitMeeting(){
 5. **空房检查：** 统计一下现在名单里还有多少正常状态 (`NORMAL`) 的人。如果没人了，触发 `TODO` 逻辑（通常是关闭房间、回收资源）。
 6. **惩罚记录：** 如果用户退出的原因是 **“被踢出 (KICK_OUT)”** 或 **“被拉黑 (BLACKLIST)”**，这属于一种**惩罚状态**。需要将这个状态写入 MySQL 数据库，确保下次他想再进来时，数据库有案底能拦住他。
 ```java
-
+@Override  
+public void exitMeetingRoom(TokenUserInfoDto tokenUserInfoDto, MeetingMemberStatusEnum statusEnum) {  
+    String meetingId = tokenUserInfoDto.getCurrentMeetingId();  
+    if(StringTools.isEmpty(meetingId)){  
+        return;  
+    }  
+    String userId = tokenUserInfoDto.getUserId();  
+    Boolean exit = redisComponent.exitMeeting(meetingId,userId,statusEnum);  
+    if(!exit){  
+        // Redis里没成功退出（可能本来就不在），但仍需清理用户的本地状态  
+        tokenUserInfoDto.setCurrentMeetingId(null);  
+        redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);  
+        return;  
+    }  
+    //清空当前正在进行的会议  
+    tokenUserInfoDto.setCurrentMeetingId(null);  
+    redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);  
+  
+    MessageSendDto messageSendDto = new MessageSendDto();  
+    messageSendDto.setMessageType(MessageTypeEnum.EXIT_MEETING_ROOM.getType());  
+    // 获取最新名单  
+    List<MeetingMemberDTO> meetingMemberDTOList = redisComponent.getMeetingMemberList(meetingId);  
+    // 封装业务包  
+    MeetingExitDto meetingExitDto = new MeetingExitDto();  
+    meetingExitDto.setExitUserId(userId)  
+            .setMeetingMemberDTOList(meetingMemberDTOList)  
+            .setExitStatus(statusEnum.getStatus());  
+    messageSendDto.setMessageContent(JSON.toJSON(meetingExitDto));  
+    messageSendDto.setMeetingId(meetingId);  
+    messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.GROUP.getType());  
+    // 发送  
+    messageHandler.sendMessage(messageSendDto);  
+  
+    List<MeetingMemberDTO> onLineMember = meetingMemberDTOList.stream().filter(item-> MeetingMemberStatusEnum.NORMAL.getStatus().equals(item.getStatus())).collect(Collectors.toList());  
+    if(onLineMember.isEmpty()){  
+        //TODO 结束会议  
+        return;  
+    }  
+    if(ArrayUtils.contains(new Integer[]{MeetingMemberStatusEnum.KICK_OUT.getStatus(),MeetingMemberStatusEnum.BLACKLIST.getStatus()},statusEnum.getStatus())){  
+        MeetingMember meetingMember = new MeetingMember();  
+        meetingMember.setStatus(statusEnum.getStatus());  
+        meetingMemberService.updateByMeetingIdAndUserId(meetingMember,meetingId,userId);  
+    }  
+}
 ```
+#### ChannelContextUtils.java
+> 在sendMsg2Group()添加内容和辅助函数。
+
+在 WebSocket 服务中，维护了两个重要的映射表（Map）：
+
+1. **`USER_CONTEXT_MAP`**: 用户 ID -> 用户物理连接 (Channel)
+    
+2. **`MEETING_ROOM_CONTEXT_MAP`**: 会议 ID -> 会议室广播组 (ChannelGroup)
+这段代码的作用是：当**有人退出会议**或者**会议彻底结束**时，及时更新这两个 Map，把人从广播组里踢出去，或者直接销毁整个广播组，**防止内存泄漏和消息误发**。
+
