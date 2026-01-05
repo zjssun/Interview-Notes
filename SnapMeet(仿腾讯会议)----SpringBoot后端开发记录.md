@@ -1535,7 +1535,7 @@ public ResponseVO getCurrentMeeting(){
 }  
   
 //结束会议  
-@RequestMapping("/fishMeeting")  
+@RequestMapping("/finishMeeting")  
 @GlobalInterceptor  
 public ResponseVO fishMeeting(){  
     TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
