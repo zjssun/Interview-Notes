@@ -1594,4 +1594,39 @@ public void forceExitMeeting(TokenUserInfoDto tokenUserInfoDto,String userId, Me
         
     - 把每一个人的 `currentMeetingId` 置空。
         
-    - **目的**：如果不做这一步，会议虽然结束了，但用户系统里还标记着“他在开会”，导致他无法加入下一个会议。
+    - 目的：如果不做这一步，会议虽然结束了，但用户系统里还标记着“他在开会”，导致他无法加入下一个会议。
+```java
+@Override  
+public void finishMeeting(String currentMeetingId, String userId) {  
+    MeetingInfo meetingInfo = this.getOne(new LambdaQueryWrapper<MeetingInfo>().eq(MeetingInfo::getMeetingId, currentMeetingId));  
+    if(userId!=null&&!meetingInfo.getCreateUserId().equals(userId)){  
+        throw new BusinessException(ResponseCodeEnum.CODE_600);  
+    }  
+    // 1. 更新主表状态
+    MeetingInfo updateInfo = new MeetingInfo();  
+    updateInfo.setStatus(MeetingStatusEnum.FINISHED.getStatus());  
+    updateInfo.setEndTime(LocalDateTime.now());  
+    this.update(updateInfo,new LambdaQueryWrapper<MeetingInfo>().eq(MeetingInfo::getMeetingId, currentMeetingId));  
+	  
+	// 2. 发送广播 (最重要的动作)
+    MessageSendDto messageSendDto = new MessageSendDto<>();  
+    messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.GROUP.getType());  
+    messageSendDto.setMessageType(MessageTypeEnum.FINISH_MEETING.getType());  
+    messageHandler.sendMessage(messageSendDto);  
+  
+    MeetingMember meetingMember = new MeetingMember();  
+    meetingMember.setMeetingStatus(MeetingStatusEnum.FINISHED.getStatus());  
+    meetingMemberService.updateByMeeingId(meetingMember,currentMeetingId);  
+  
+    //TODO 更新预约会议状态  
+  
+    List<MeetingMemberDTO> meetingMemberDTOList = redisComponent.getMeetingMemberList(currentMeetingId);  
+    // 3. 批量释放用户状态
+    for (MeetingMemberDTO meetingMemberDTO:meetingMemberDTOList){  
+    // 查出该用户
+        TokenUserInfoDto userInfoDto = this.redisComponent.getTokenUserInfoDtoByUserId(meetingMemberDTO.getUserId());  
+        userInfoDto.setCurrentMeetingId(null);  
+        redisComponent.saveTokenUserInfoDto(userInfoDto);  
+    }  
+}
+```
