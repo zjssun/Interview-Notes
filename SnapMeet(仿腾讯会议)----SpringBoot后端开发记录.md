@@ -1572,3 +1572,26 @@ public void forceExitMeeting(TokenUserInfoDto tokenUserInfoDto,String userId, Me
 }
 ```
 ##### `finishMeeting` (结束会议)
+这个方法用于彻底关闭一个会议，解散所有人。
+**业务流程：**
+- **验权限**：同样先查库，判断操作人是否是房主。
+    
+    - _注意_：这里加了 `if(userId!=null)` 判断，这暗示该方法可能支持**系统自动结束**（例如定时任务扫描超时会议），此时 `userId` 为 null，跳过权限校验。
+        
+- **标记会议结束 (DB)**：修改 `MeetingInfo` 表，将状态改为 `FINISHED`，并记录结束时间。
+    
+- **广播通知**：发送类型为 `FINISH_MEETING` 的消息。
+    
+    - 这会触发前端强制关闭页面。
+        
+    - 也会触发后端 Netty 组件（你之前贴的代码）去销毁整个 `ChannelGroup`。
+        
+- **更新历史记录 (DB)**：将 `MeetingMember` 表里该会议所有成员的状态更新为 `FINISHED`（存档用）。
+    
+- **释放所有成员 (Redis)**：
+    
+    - 遍历当前 Redis 里的参会名单。
+        
+    - 把每一个人的 `currentMeetingId` 置空。
+        
+    - **目的**：如果不做这一步，会议虽然结束了，但用户系统里还标记着“他在开会”，导致他无法加入下一个会议。
