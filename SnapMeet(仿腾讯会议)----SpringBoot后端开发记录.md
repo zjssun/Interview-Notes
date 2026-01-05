@@ -1544,3 +1544,31 @@ public ResponseVO fishMeeting(){
 }
 ```
 #### MeetingInfoServiceImpl.java
+##### `forceExitMeeting` (强制踢人/拉黑)
+这个方法用于主持人将捣乱的用户踢出会议（`KICK_OUT`）或者直接拉黑（`BLACKLIST`）。
+**业务流程：**
+- **查会议**：根据操作人（主持人）当前所在的 `meetingId` 去数据库查询会议信息。
+    
+- **验权限**：**关键点**。检查当前操作人的 ID (`tokenUserInfoDto.getUserId()`) 是否等于会议的创建者 ID (`CreateUserId`)。只有房主才能踢人，否则抛出异常。
+    
+- **找目标**：通过传入的 `userId`（倒霉蛋的ID），去 Redis 里查出这个倒霉蛋的 Token 信息。
+    
+- **执行踢出**：**巧妙复用**。直接调用上一段代码中解释过的 `exitMeetingRoom` 方法。
+    
+    - 因为 `exitMeetingRoom` 里已经写好了“Redis 清理”、“广播通知”、“由状态触发的写库惩罚（记录被踢/拉黑状态）”等逻辑，所以这里不需要重写，直接传入对应的状态枚举（`KICK_OUT` 或 `BLACKLIST`）即可。
+```java
+@Override  
+public void forceExitMeeting(TokenUserInfoDto tokenUserInfoDto,String userId, MeetingMemberStatusEnum statusEnum) {  
+  
+    MeetingInfo meetingInfo = this.getOne(new LambdaQueryWrapper<MeetingInfo>().eq(MeetingInfo::getMeetingId, tokenUserInfoDto.getCurrentMeetingId()));  
+    // 验权：如果你不是房主，报错
+    if(!meetingInfo.getCreateUserId().equals(tokenUserInfoDto.getUserId())){  
+        throw new BusinessException(ResponseCodeEnum.CODE_600);  
+    }  
+    // 获取被踢人的信息
+    TokenUserInfoDto userInfoDto = this.redisComponent.getTokenUserInfoDtoByUserId(userId);  
+    // 复用退出逻辑，statusEnum 传入 KICK_OUT 或 BLACKLIST
+    exitMeetingRoom(userInfoDto,statusEnum);  
+}
+```
+##### `finishMeeting` (结束会议)
