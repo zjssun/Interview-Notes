@@ -1439,3 +1439,40 @@ public void exitMeetingRoom(TokenUserInfoDto tokenUserInfoDto, MeetingMemberStat
 这段代码的作用是：当**有人退出会议**或者**会议彻底结束**时，及时更新这两个 Map，把人从广播组里踢出去，或者直接销毁整个广播组，**防止内存泄漏和消息误发**。
 
 ##### 场景 1：单人退出会议 (`EXIT_MEETING_ROOM`)
+```java
+if(MessageTypeEnum.EXIT_MEETING_ROOM.getType().equals(messageSendDto.getMessageType())){
+    // 1. 解析数据，知道是谁要走
+    MeetingExitDto exitDto = JSON.parseObject((String) messageSendDto.getMessageContent(),MeetingExitDto.class);
+    
+    // 2.【核心动作】把这个人的连接，从会议室的广播组(ChannelGroup)里移除
+    removeContextFromGroup(exitDto.getExitUserId(), messageSendDto.getMeetingId());
+    
+    // 3. 检查房间是否空了
+    // 去 Redis 查一下现在的名单，过滤出还在正常在线(NORMAL)的人
+    List<MeetingMemberDTO> meetingMemberDTOList = redisComponent.getMeetingMemberList(messageSendDto.getMeetingId());
+    List<MeetingMemberDTO> onLineMember = meetingMemberDTOList.stream()
+            .filter(item-> MeetingMemberStatusEnum.NORMAL.getStatus().equals(item.getStatus()))
+            .collect(Collectors.toList());
+            
+    // 4. 如果房间里没人了，直接销毁这个房间的 Context
+    if(onLineMember.isEmpty()){
+        removeContextGroup(messageSendDto.getMeetingId());
+    }
+    return;
+}
+```
+##### 场景 2：会议结束 (`FINISH_MEETING`)
+```java
+if(MessageTypeEnum.FINISH_MEETING.getType().equals(messageSendDto.getMessageType())){
+    // 1. 拿到所有参会人员名单
+    List<MeetingMemberDTO> meetingMemberDTOList = redisComponent.getMeetingMemberList(messageSendDto.getMeetingId());
+    
+    // 2. 遍历所有人，挨个从广播组里移除
+    for(MeetingMemberDTO meetingMemberDto : meetingMemberDTOList){
+        removeContextFromGroup(meetingMemberDto.getUserId(), messageSendDto.getMeetingId());
+    }
+    
+    // 3. 销毁会议室 Context
+    removeContextGroup(messageSendDto.getMeetingId());
+}
+```
