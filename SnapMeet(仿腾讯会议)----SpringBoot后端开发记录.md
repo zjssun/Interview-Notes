@@ -1741,3 +1741,4 @@ WHERE t1.invite_user_id = '传入的userId'
 	AND t.status = 传入的status 
 	AND t.create_time >= '2026-01-06 00:00:00' AND t.create_time < '2026-01-07 00:00:00';
 ```
+#### 删除预约会议
