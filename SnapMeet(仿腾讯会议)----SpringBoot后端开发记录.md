@@ -1712,4 +1712,32 @@ public void createMeetingReserve(MeetingReserve meetingReserve) {
     meetingReserveMemberMapper.insertOrUpdate(reserveMemberList);  
  }
 ```
-#### 
+#### 查询某用户今日相关的会议预约列表
+```java
+@Override  
+public List<MeetingReserve> getTodayMeeting(String userId, Integer status) {  
+    LocalDateTime startOfDay = LocalDate.now().atStartOfDay();  
+    LocalDateTime endOfDay = LocalDate.now().plusDays(1).atStartOfDay();  
+    MPJLambdaWrapper<MeetingReserve> wrapper = new MPJLambdaWrapper<MeetingReserve>()  
+            .selectAll(MeetingReserve.class)  
+            .distinct()  
+            .leftJoin(MeetingReserveMember.class, MeetingReserveMember::getMeetingId, MeetingReserve::getMeetingId)  
+            //WHERE 条件 : 筛选参会人是“我”
+            .eq(MeetingReserveMember::getInviteUserId, userId)  
+            // WHERE 条件 : 筛选会议状态
+            .eq(MeetingReserve::getStatus, status)  
+            // WHERE 条件 : 筛选时间 (create_time >= 今天0点 AND create_time < 明天0点)
+            .ge(MeetingReserve::getCreateTime, startOfDay)  
+            .lt(MeetingReserve::getCreateTime, endOfDay);  
+    List<MeetingReserve> list = this.list(wrapper);  
+    return  list;  
+}
+```
+等价的 SQL 语句
+```sql
+SELECT DISTINCT t.* FROM meeting_reserve t 
+LEFT JOIN meeting_reserve_member t1 ON t1.meeting_id = t.meeting_id 
+WHERE t1.invite_user_id = '传入的userId' 
+	AND t.status = 传入的status 
+	AND t.create_time >= '2026-01-06 00:00:00' AND t.create_time < '2026-01-07 00:00:00';
+```
