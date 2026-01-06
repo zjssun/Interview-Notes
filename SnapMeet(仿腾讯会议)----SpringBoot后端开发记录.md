@@ -1742,3 +1742,21 @@ WHERE t1.invite_user_id = '传入的userId'
 	AND t.create_time >= '2026-01-06 00:00:00' AND t.create_time < '2026-01-07 00:00:00';
 ```
 #### 删除预约会议
+```java
+@Override  
+public void deleteMeetingReserve(String meetingId, String userId) {  
+    MPJLambdaWrapper<MeetingReserveMember> wrapper = new MPJLambdaWrapper<MeetingReserveMember>()  
+            .selectAll(MeetingReserveMember.class)  
+            // SQL: LEFT JOIN meeting_reserve t1 ON t1.id = t.meeting_id  
+            .leftJoin(MeetingReserve.class, MeetingReserve::getMeetingId, MeetingReserveMember::getMeetingId)  
+            .eq(MeetingReserveMember::getMeetingId, meetingId)  
+            .eq(MeetingReserve::getCreateUserId, userId);  
+    long count = this.count(wrapper);  
+    //只有当“你是发起人”且“会议成员数量大于 0” 时，才允许删除
+    if(count>0){  
+        MeetingReserveMember meetingReserveMember = new MeetingReserveMember();  
+        meetingReserveMember.setMeetingId(meetingId);  
+        this.remove(new MPJLambdaWrapper<MeetingReserveMember>().eq(MeetingReserveMember::getMeetingId, meetingId));  
+    }  
+}
+```
