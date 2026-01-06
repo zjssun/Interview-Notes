@@ -1631,4 +1631,49 @@ public void finishMeeting(String currentMeetingId, String userId) {
 }
 ```
 
-### 1
+### 预约会议
+#### MeetingReserveController.java
+```java
+@RequestMapping("/loadMeetingReserve")  
+public ResponseVO loadMeetingReserve(){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    List<MeetingReserve> list = meetingReserveService.getReserveInfo(tokenUserInfoDto.getUserId(), MeetingReserveStatusEnum.NO_START.getStatus());  
+    return getSuccessResponseVO(list);  
+}  
+  
+@RequestMapping("/CreateMeetingReserve")  
+public ResponseVO CreateMeetingReserve(MeetingReserve meetingReserve){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    meetingReserve.setCreateUserId(tokenUserInfoDto.getUserId());  
+    meetingReserveService.createMeetingReserve(meetingReserve);  
+    return getSuccessResponseVO(null);  
+}  
+  
+@RequestMapping("/delMeetingReserve")  
+public ResponseVO delMeetingReserve(@NotEmpty String meetingId){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    meetingReserveMemberService.deleteMeetingReserve(meetingId,tokenUserInfoDto.getUserId());  
+    return getSuccessResponseVO(null);  
+}  
+  
+@RequestMapping("/loadTodayMeeting")  
+public ResponseVO loadTodayMeeting(){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    List<MeetingReserve> list = meetingReserveService.getTodayMeeting(tokenUserInfoDto.getUserId(),MeetingReserveStatusEnum.NO_START.getStatus());  
+    return getSuccessResponseVO(list);  
+}
+```
+#### 获取预约会议记录
+传入userId和会议状态
+```java
+@Override  
+public List<MeetingReserve> getReserveInfo(String userId, Integer status) {  
+    MPJLambdaWrapper<MeetingReserve> wrapper = JoinWrappers.lambda(MeetingReserve.class)  
+            .selectAll(MeetingInfo.class)  
+            .select(UserInfo::getNickName)  
+            .leftJoin(UserInfo.class, UserInfo::getUserId, MeetingReserve::getCreateUserId)  
+            .inSql(MeetingReserve::getMeetingId, "SELECT meeting_id FROM meeting_reserve_member WHERE invite_user_id = '" + userId + "'");  
+    return meetingReserveMapper.selectJoinList(MeetingReserve.class,wrapper);  
+}
+```
+#### 创建预约会议
