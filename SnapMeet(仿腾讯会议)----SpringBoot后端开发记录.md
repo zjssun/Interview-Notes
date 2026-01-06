@@ -1678,3 +1678,37 @@ public List<MeetingReserve> getReserveInfo(String userId, Integer status) {
 ```
 #### 创建预约会议
 **流程：**初始化会议信息** -> 2. **保存主表** -> 3. **解析邀请名单** -> 4. **添加发起人** -> 5. **批量保存成员**
+```java
+@Override  
+public void createMeetingReserve(MeetingReserve meetingReserve) {  
+	// 1. 生成唯一的会议ID
+    meetingReserve.setMeetingId(StringTools.getMeetingNoOrMeetingId());  
+    // 2. 记录创建时间
+    meetingReserve.setCreateTime(LocalDateTime.now());  
+    // 3. 设置初始状态为“未开始”
+    meetingReserve.setStatus(MeetingReserveStatusEnum.NO_START.getStatus());  
+    // 4. 保存到 meeting_reserve 表
+    this.save(meetingReserve);  
+  
+    List<MeetingReserveMember> reserveMemberList = new ArrayList<>();  
+    // 端传过来的是 "user1,user2,user3" 这样的逗号分隔字符串
+    if(!StringTools.isEmpty(meetingReserve.getInviteUserIds())) {  
+        String[] inviteUserIdArray = meetingReserve.getInviteUserIds().split(",");  
+        for(String userId:inviteUserIdArray){  
+            MeetingReserveMember member = new MeetingReserveMember();  
+            // 关联刚才生成的会议ID
+            member.setMeetingId(meetingReserve.getMeetingId());  
+            // 设置参会人ID
+            member.setInviteUserId(userId);  
+            // 加入列表
+            reserveMemberList.add(member);  
+        }  
+    }  
+    MeetingReserveMember member = new MeetingReserveMember();  
+    member.setMeetingId(meetingReserve.getMeetingId());  
+    member.setInviteUserId(meetingReserve.getCreateUserId());  
+    reserveMemberList.add(member);  
+    //批量保存成员
+    meetingReserveMemberMapper.insertOrUpdate(reserveMemberList);  
+ }
+```
