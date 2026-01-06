@@ -1677,3 +1677,4 @@ public List<MeetingReserve> getReserveInfo(String userId, Integer status) {
 }
 ```
 #### 创建预约会议
+**流程：**初始化会议信息** -> 2. **保存主表** -> 3. **解析邀请名单** -> 4. **添加发起人** -> 5. **批量保存成员**
