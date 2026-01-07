@@ -1761,6 +1761,7 @@ public void deleteMeetingReserve(String meetingId, String userId) {
 }
 ```
 #### 加入预约会议
+把预约的会议数据加入到正式会议数据。
 ```java
 @Override  
 public void reserveJoinMeeting(String meetingId, TokenUserInfoDto tokenUserInfoDto, String joinPassword) {  
