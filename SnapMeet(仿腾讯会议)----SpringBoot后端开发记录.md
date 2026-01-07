@@ -1760,3 +1760,41 @@ public void deleteMeetingReserve(String meetingId, String userId) {
     }  
 }
 ```
+#### 加入预约会议
+```java
+@Override  
+public void reserveJoinMeeting(String meetingId, TokenUserInfoDto tokenUserInfoDto, String joinPassword) {  
+    String userId = tokenUserInfoDto.getUserId();  
+    if(!StringTools.isEmpty(tokenUserInfoDto.getCurrentMeetingId()) && !meetingId.equals(tokenUserInfoDto.getCurrentMeetingId())){  
+        throw new BusinessException("你有未结束的会议");  
+    }  
+    checkMeetingJoin(meetingId,userId);  
+    MeetingReserve meetingReserve = meetingReserveService.getMeetingReserve(meetingId);  
+    if(meetingReserve==null){  
+        throw  new BusinessException(ResponseCodeEnum.CODE_600);  
+    }  
+    MeetingReserveMember member = meetingReserveMemberService.selectByMeetingIdAndUserId(meetingId,userId);  
+    if (member == null) {  
+        throw new BusinessException(ResponseCodeEnum.CODE_600);  
+    }  
+    if(MeetingJoinTypeEnum.PASSWORD.getType().equals(meetingReserve.getJoinType())&&!meetingReserve.getJoinPassword().equals(joinPassword)){  
+        throw  new BusinessException("入会密码不正确");  
+    }  
+    MeetingInfo meetingInfo = this.getOne(new LambdaQueryWrapper<MeetingInfo>().eq(MeetingInfo::getMeetingId, meetingId));  
+    if(meetingInfo==null){  
+        meetingInfo = new MeetingInfo();  
+        meetingInfo.setMeetingName(meetingReserve.getMeetingName());  
+        meetingInfo.setMeetingNo(StringTools.getMeetingNoOrMeetingId());  
+        meetingInfo.setJoinType(meetingReserve.getJoinType());  
+        meetingInfo.setJoinPassword(meetingReserve.getJoinPassword());  
+        meetingInfo.setCreateTime(LocalDateTime.now());  
+        meetingInfo.setMeetingId(meetingId);  
+        meetingInfo.setStartTime(LocalDateTime.now());  
+        meetingInfo.setStatus(MeetingStatusEnum.RUNING.getStatus());  
+        meetingInfo.setCreateUserId(meetingReserve.getCreateUserId());  
+        this.save(meetingInfo);  
+    }  
+    tokenUserInfoDto.setCurrentMeetingId(meetingId);  
+    redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);  
+}
+```
