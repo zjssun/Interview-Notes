@@ -1809,3 +1809,4 @@ public void reserveJoinMeeting(String meetingId, TokenUserInfoDto tokenUserInfoD
 | **contact_id**       | varchar  | 12     | 是      | -       | **PRI** | -      |
 | **status**           | int      | 1      | 是      | -       |         | -      |
 | **last_update_time** | datetime | -      | 是      | -       |         | -      |
+#### 好友申请表(user_contact_apply)
