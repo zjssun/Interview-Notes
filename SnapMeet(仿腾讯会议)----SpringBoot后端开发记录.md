@@ -1810,3 +1810,10 @@ public void reserveJoinMeeting(String meetingId, TokenUserInfoDto tokenUserInfoD
 | **status**           | int      | 1      | 是      | -       |         | -      |
 | **last_update_time** | datetime | -      | 是      | -       |         | -      |
 #### 好友申请表(user_contact_apply)
+| 字段名 | 数据类型 | 长度 | 非空 | 默认值 | 键 | 备注 |
+| :--- | :--- | :--- | :---: | :---: | :---: | :--- |
+| **apply_id** | int | 11 | 是 | - | PRI | - |
+| **apply_user_id** | varchar | 12 | 是 | - | | - |
+| **receive_user_id** | varchar | 12 | 是 | - | UNI | - |
+| **last_apply_time** | datetime | - | 是 | - | MUL | - |
+| **status** | int | 1 | 是 | - | | - |
