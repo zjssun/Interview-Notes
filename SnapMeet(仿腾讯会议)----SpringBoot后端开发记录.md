@@ -1801,4 +1801,11 @@ public void reserveJoinMeeting(String meetingId, TokenUserInfoDto tokenUserInfoD
 ```
 # 联系人申请
 ### 数据库
+#### 联系人表(user_contact)
 
+| **字段名**              | **数据类型** | **长度** | **非空** | **默认值** | **键**   | **备注** |
+| -------------------- | -------- | ------ | ------ | ------- | ------- | ------ |
+| **user_id**          | varchar  | 12     | 是      | -       | **PRI** | -      |
+| **contact_id**       | varchar  | 12     | 是      | -       | **PRI** | -      |
+| **status**           | int      | 1      | 是      | -       |         | -      |
+| **last_update_time** | datetime | -      | 是      | -       |         | -      |
