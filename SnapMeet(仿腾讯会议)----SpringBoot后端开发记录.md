@@ -1828,3 +1828,50 @@ public ResponseVO searchContact(@NotEmpty String userId){
     return getSuccessResponseVO(userInfoVO4Search);  
 }
 ```
+发送好友邀请
+```java
+@RequestMapping("/contactApply")  
+@GlobalInterceptor  
+public ResponseVO contactApply(@NotEmpty String receiverUserId){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    UserContactApply userContactApply = new UserContactApply();  
+    userContactApply.setApplyUserId(tokenUserInfoDto.getUserId());  
+    userContactApply.setReceiveUserId(receiverUserId);  
+    Integer status = userContactApplyService.saveUserContactApply(userContactApply);  
+    return getSuccessResponseVO(status);  
+}
+```
+处理好友申请
+```java
+@RequestMapping("/dealWithApply")  
+@GlobalInterceptor  
+public ResponseVO dealWithApply(@NotEmpty String applyUserId, @NotNull Integer status){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    userContactApplyService.dealWithApply(applyUserId,tokenUserInfoDto.getUserId(),tokenUserInfoDto.getNickName(),status);  
+    return getSuccessResponseVO(null);  
+}
+```
+加载好友列表
+```java
+@RequestMapping("/loadContactUser")  
+@GlobalInterceptor  
+public ResponseVO loadContactUser(){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    List<UserContact> userContactList = userContactService.list(new LambdaQueryWrapper<UserContact>()  
+            .eq(UserContact::getUserId,tokenUserInfoDto.getUserId())  
+            .eq(UserContact::getStatus, UserContactStatusEnum.FRIEND.getStatus()));  
+    return getSuccessResponseVO(userContactList);  
+}
+```
+加载申请列表
+```java
+@RequestMapping("/loadContactApply")  
+@GlobalInterceptor  
+public ResponseVO loadContactApply(){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    List<UserContactApply> ApplyList = userContactApplyService.list(new LambdaQueryWrapper<UserContactApply>()  
+            .eq(UserContactApply::getReceiveUserId,tokenUserInfoDto.getUserId()));  
+    return getSuccessResponseVO(ApplyList);  
+}
+```
+### 服务函数
