@@ -1910,4 +1910,42 @@ public ResponseVO loadContactApply(){
 - **陌生人**：
     
     - 如果上面都没命中，返回默认状态（通常是空或 0），前端显示“添加好友”按钮。
-
+```java
+@Override  
+public UserInfoVO4Search searchContact(String myUserId, String userId) {  
+  
+    UserInfo userInfo = userInfoService.getOne(new LambdaQueryWrapper<UserInfo>().eq(UserInfo::getUserId,userId));  
+    if(userInfo==null){  
+        return null;  
+    }  
+    UserInfoVO4Search result = new UserInfoVO4Search();  
+    result.setUserId(userInfo.getUserId());  
+    result.setNickName(userInfo.getNickName());  
+    if(myUserId.equals(userId)){  
+        result.setStatus(-UserContactApplyStatusEnum.PASS.getStatus());  
+    }  
+    UserContactApply contactApply = userContactApplyService.getOne(new LambdaQueryWrapper<UserContactApply>()  
+            .eq(UserContactApply::getApplyUserId,myUserId).eq(UserContactApply::getReceiveUserId,userId));  
+  
+    UserContact userContact = this.getOne(new LambdaQueryWrapper<UserContact>().eq(UserContact::getUserId,userId)  
+            .eq(UserContact::getContactId,myUserId));  
+    if(contactApply!=null&&UserContactApplyStatusEnum.BLACKLIST.getStatus().equals(contactApply.getStatus()) ||  
+    userContact != null && UserContactApplyStatusEnum.BLACKLIST.getStatus().equals(userContact.getStatus())){  
+        result.setStatus(UserContactApplyStatusEnum.BLACKLIST.getStatus());  
+        return result;  
+    }  
+    if(contactApply!=null&&UserContactApplyStatusEnum.INIT.getStatus().equals(contactApply.getStatus())){  
+        result.setStatus(UserContactApplyStatusEnum.INIT.getStatus());  
+        return result;  
+    }  
+    UserContact myUserContact = this.getOne(new LambdaQueryWrapper<UserContact>().eq(UserContact::getUserId,myUserId).eq(UserContact::getContactId,userId));  
+    if(userContact!=null && UserContactStatusEnum.FRIEND.getStatus().equals(userContact.getStatus())&&  
+    myUserContact!=null&& UserContactStatusEnum.FRIEND.getStatus().equals(myUserContact.getStatus())){  
+        result.setStatus(UserContactStatusEnum.FRIEND.getStatus());  
+        return  result;  
+    }  
+  
+    return result;  
+}
+```
+#### 
