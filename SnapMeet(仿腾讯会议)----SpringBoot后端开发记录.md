@@ -1817,3 +1817,14 @@ public void reserveJoinMeeting(String meetingId, TokenUserInfoDto tokenUserInfoD
 | **receive_user_id** | varchar  | 12  |  是  |  -  | UNI | -   |
 | **last_apply_time** | datetime | -   |  是  |  -  | MUL | -   |
 | **status**          | int      | 1   |  是  |  -  |     | -   |
+### 接口
+搜索联系人
+```java
+@RequestMapping("/searchContact")  
+@GlobalInterceptor  
+public ResponseVO searchContact(@NotEmpty String userId){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    UserInfoVO4Search userInfoVO4Search = userContactService.searchContact(tokenUserInfoDto.getUserId(),userId);  
+    return getSuccessResponseVO(userInfoVO4Search);  
+}
+```
