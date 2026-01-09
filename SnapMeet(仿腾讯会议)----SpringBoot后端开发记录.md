@@ -2032,3 +2032,45 @@ public Integer saveUserContactApply(UserContactApply userContactApply) {
 - **发送通知**：
     
     - 给申请人发个即时消息，告诉他：“对方通过了你的验证”或者“对方拒绝了你”。
+```java
+@Override  
+public void dealWithApply(String applyUserId, String userId, String nickName, Integer status) {  
+    UserContactApplyStatusEnum statusEnum = UserContactApplyStatusEnum.getByStatus(status);  
+    if(statusEnum==null||UserContactApplyStatusEnum.INIT == statusEnum){  
+        throw new BusinessException(ResponseCodeEnum.CODE_600);  
+    }  
+    UserContactApply apply = this.getOne(new LambdaQueryWrapper<UserContactApply>()  
+            .eq(UserContactApply::getApplyUserId,applyUserId)  
+            .eq(UserContactApply::getReceiveUserId,userId));  
+    if(apply==null){  
+        throw new BusinessException(ResponseCodeEnum.CODE_600);  
+    }  
+  
+    if(UserContactApplyStatusEnum.PASS == statusEnum){  
+        UserContact userContact = new UserContact();  
+        userContact.setContactId(userId);  
+        userContact.setUserId(applyUserId);  
+        userContact.setStatus(UserContactStatusEnum.FRIEND.getStatus());  
+        userContact.setLastUpdateTime(LocalDateTime.now());  
+        userContactService.saveOrUpdate(userContact);  
+  
+        userContact.setUserId(userId);  
+        userContact.setContactId(applyUserId);  
+        userContactService.saveOrUpdate(userContact);  
+    }  
+  
+    UserContactApply updateApply = new UserContactApply();  
+    updateApply.setStatus(status);  
+    this.update(updateApply,new LambdaQueryWrapper<UserContactApply>()  
+            .eq(UserContactApply::getApplyUserId,applyUserId)  
+            .eq(UserContactApply::getReceiveUserId, userId));  
+  
+    MessageSendDto sendDto = new MessageSendDto();  
+    sendDto.setMessageSend2Type(MessageSend2TypeEnum.USER.getType());  
+    sendDto.setMessageType(MessageTypeEnum.USER_CONTACT_DEAL_WITH.getType());  
+    sendDto.setReceiveUserId(applyUserId);  
+    sendDto.setSendUserNickName(nickName);  
+    sendDto.setMessageContent(status);  
+    messageHandler.sendMessage(sendDto);  
+}
+```
