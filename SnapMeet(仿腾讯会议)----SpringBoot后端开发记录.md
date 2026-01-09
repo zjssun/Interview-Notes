@@ -1952,11 +1952,10 @@ public UserInfoVO4Search searchContact(String myUserId, String userId) {
 **核心业务流程：**
 1. **拉黑校验 (Blacklist Check)**：
     - 先去对方的好友列表里查，看我是否被对方拉黑了。如果是，直接抛出异常，阻止申请。
-        
+    
 2. **自动恢复好友 (Auto-Rejoin)**：
-
     - 如果对方列表里我是好友状态（说明对方没删我，可能是我单方面删了对方），那么不需要发申请，直接把“我这边的关系”改回“好友”即可。
-        
+    
 3. **保存/更新申请记录 (Save/Update Apply)**：
     
     - 如果以上情况都不是，说明是正常的加好友。
@@ -1970,3 +1969,4 @@ public UserInfoVO4Search searchContact(String myUserId, String userId) {
 4. **发送通知 (Notify)**：
     
     - 通过 WebSocket (RabbitMQ) 给对方发一条实时消息，提示“有人加你好友”。
+	
