@@ -1818,7 +1818,7 @@ public void reserveJoinMeeting(String meetingId, TokenUserInfoDto tokenUserInfoD
 | **last_apply_time** | datetime | -   |  是  |  -  | MUL | -   |
 | **status**          | int      | 1   |  是  |  -  |     | -   |
 ### 接口
-s'qing
+判断
 ```java
 @RequestMapping("/searchContact")  
 @GlobalInterceptor  
