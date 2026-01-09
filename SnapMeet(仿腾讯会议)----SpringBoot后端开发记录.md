@@ -1969,4 +1969,45 @@ public UserInfoVO4Search searchContact(String myUserId, String userId) {
 4. **发送通知 (Notify)**：
     
     - 通过 WebSocket (RabbitMQ) 给对方发一条实时消息，提示“有人加你好友”。
-	
+```java
+@Override  
+public Integer saveUserContactApply(UserContactApply userContactApply) {  
+    UserContact userContact = userContactService.getOne(new LambdaQueryWrapper<UserContact>()  
+            .eq(UserContact::getContactId,userContactApply.getReceiveUserId())  
+            .eq(UserContact::getUserId,userContactApply.getApplyId()));  
+    if(userContact!=null&& UserContactStatusEnum.BLACKLIST.getStatus().equals(userContact.getStatus())){  
+        throw new BusinessException("对方将你拉黑");  
+    }  
+    if(userContact!=null&&UserContactStatusEnum.FRIEND.getStatus().equals(userContact.getStatus())){  
+        UserContact updateInfo = new UserContact();  
+        updateInfo.setStatus(UserContactStatusEnum.FRIEND.getStatus());  
+        userContactService.update(updateInfo,new LambdaQueryWrapper<UserContact>()  
+                .eq(UserContact::getUserId,userContactApply.getApplyUserId())  
+                .eq(UserContact::getContactId,userContactApply.getReceiveUserId()));  
+        return UserContactStatusEnum.FRIEND.getStatus();  
+    }  
+  
+    UserContactApply apply = this.getOne(new LambdaQueryWrapper<UserContactApply>()  
+            .eq(UserContactApply::getApplyUserId,userContactApply.getApplyUserId())  
+            .eq(UserContactApply::getReceiveUserId,userContactApply.getReceiveUserId()));  
+    if(apply==null){  
+        userContactApply.setStatus(UserContactApplyStatusEnum.INIT.getStatus());  
+        userContactApply.setLastApplyTime(LocalDateTime.now());  
+        this.save(userContactApply);  
+    }else {  
+        UserContactApply update = new UserContactApply();  
+        userContactApply.setStatus(UserContactApplyStatusEnum.INIT.getStatus());  
+        userContactApply.setLastApplyTime(LocalDateTime.now());  
+        this.update(update,new LambdaQueryWrapper<UserContactApply>()  
+                .eq(UserContactApply::getApplyUserId,userContactApply.getApplyId())  
+                .eq(UserContactApply::getReceiveUserId, userContactApply.getReceiveUserId()));  
+    }  
+  
+    MessageSendDto messageSendDto = new MessageSendDto<>();  
+    messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.USER.getType());  
+    messageSendDto.setMessageType(MessageTypeEnum.USER_CONTACT_APPLY.getType());  
+    messageSendDto.setReceiveUserId(userContactApply.getReceiveUserId());  
+    messageHandler.sendMessage(messageSendDto);  
+    return UserContactApplyStatusEnum.INIT.getStatus();  
+}
+```
