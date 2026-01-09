@@ -1875,3 +1875,6 @@ public ResponseVO loadContactApply(){
 }
 ```
 ### 服务函数
+#### 搜索用户
+**核心业务流程：**
+
