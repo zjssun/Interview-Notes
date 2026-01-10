@@ -1799,7 +1799,7 @@ public void reserveJoinMeeting(String meetingId, TokenUserInfoDto tokenUserInfoD
     redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);  
 }
 ```
-# 联系人申请
+# 联系人
 ### 数据库
 #### 联系人表(user_contact)
 
@@ -2074,4 +2074,4 @@ public void dealWithApply(String applyUserId, String userId, String nickName, In
     messageHandler.sendMessage(sendDto);  
 }
 ```
-# dd
+### 联系人入会
