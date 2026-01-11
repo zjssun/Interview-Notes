@@ -10,3 +10,5 @@
 > **用Part One的图来喂新图。**
 
 _A low-resolution digital photo taken on a Sony CCD-TRV._ **A high-angle shot from near the front of the car looking down. The hood of a black 1976 Chevrolet Impala is open. A tuxedo cat stands on the edge of the engine bay, holding a container of coolant, and is pouring it into the coolant reservoir to refill it.** _digital noise in the shadows. The skin texture looks slightly waxy due to early digital processing. Orange date stamp in the bottom right corner reading "{argument name="date stamp" default="06/06/1998"}". ==Candid, awkward angles, Myspace photo aesthetic, No humans allowed, vertical aspect ratio, 9:16.==_
+![](assets/Gemimi%20&%20Sora2/file-20260112002803158.png)
+**VIDEO**
