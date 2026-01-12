@@ -20,3 +20,5 @@
 
 ![](assets/Gemimi%20&%20Sora2/file-20260112025242327.png)
 **最后成品**
+https://youtube.com/shorts/Oogx3A7lrIg?feature=share
+
