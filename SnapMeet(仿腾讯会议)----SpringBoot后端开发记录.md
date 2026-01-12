@@ -2124,4 +2124,52 @@ public ResponseVO acceptInvite(@NotEmpty String meetingId){
         
     - **构建消息**：封装一个 `INVITE_MEMBER_MEETING` 类型的消息，包含会议名字、邀请人名字、会议 ID。
         
-    - **发送消息**：通过 WebSocket/RabbitMQ 推送给被邀请人。
+    - **发送消息**：通过 WebSocket/RabbitMQ 推送给被邀请人。'
+    ```java
+    @Override  
+public void inviteMember(TokenUserInfoDto tokenUserInfoDto, String selectContactIds) {  
+    String[] contactIds = selectContactIds.split(",");  
+    List<UserContact> userContactList = userContactService.list(new LambdaQueryWrapper<UserContact>()  
+            .eq(UserContact::getUserId, tokenUserInfoDto.getUserId())  
+            .eq(UserContact::getStatus,UserContactStatusEnum.FRIEND.getStatus()));  
+    List<String> contactIdList = userContactList.stream().map(UserContact::getContactId).toList();  
+    if(!contactIdList.containsAll(Arrays.asList(contactIds))){  
+        throw new  BusinessException(ResponseCodeEnum.CODE_600);  
+    }  
+    MeetingInfo meetingInfo = this.getOne(new LambdaQueryWrapper<MeetingInfo>()  
+            .eq(MeetingInfo::getMeetingId,tokenUserInfoDto.getCurrentMeetingId()));  
+    for(String contactId : contactIds){  
+        MeetingMemberDTO meetingMemberDTO = redisComponent.getMeetingMember(tokenUserInfoDto.getCurrentMeetingId(),contactId);  
+        if(meetingMemberDTO!=null&&MeetingMemberStatusEnum.NORMAL.getStatus().equals(meetingInfo.getStatus())){  
+            continue;  
+        }  
+        redisComponent.addInviteInfo(tokenUserInfoDto.getCurrentMeetingId(),contactId);  
+        MessageSendDto messageSendDto = new  MessageSendDto();  
+        messageSendDto.setMessageType(MessageTypeEnum.INVITE_MEMBER_MEETING.getType());  
+        messageSendDto.setMessageSend2Type(MessageSend2TypeEnum.USER.getType());  
+        messageSendDto.setReceiveUserId(contactId);  
+  
+        MeetingInviteDto meetingInviteDto = new MeetingInviteDto();  
+        meetingInviteDto.setMeetingName(meetingInfo.getMeetingName());  
+        meetingInviteDto.setInviteUserName(tokenUserInfoDto.getNickName());  
+        meetingInviteDto.setMeetingId(tokenUserInfoDto.getCurrentMeetingId());  
+  
+        messageSendDto.setMessageContent(JSON.toJSON(meetingInviteDto));  
+        messageHandler.sendMessage(messageSendDto);  
+    }  
+}
+    ```
+##### 接受好友邀请的会议
+```java
+@Override  
+public void acceptInvite(TokenUserInfoDto tokenUserInfoDto, String meetingId) {  
+    String redisMeetingId = redisComponent.getInviteInfo(tokenUserInfoDto.getUserId(),meetingId);  
+    if(redisMeetingId==null){  
+        throw new   BusinessException("邀请信息已过期！");  
+    }  
+    tokenUserInfoDto.setCurrentMeetingId(redisMeetingId);  
+    tokenUserInfoDto.setCurrentNickName(tokenUserInfoDto.getNickName());  
+    redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);  
+}
+```
+### 
