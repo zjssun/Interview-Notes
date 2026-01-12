@@ -2097,4 +2097,31 @@ public ResponseVO acceptInvite(@NotEmpty String meetingId){
 ```
 #### 服务函数
 ##### 在会议中邀请好友加入
-
+**业务流程分析：**
+- **解析名单**：
+    
+    - 前端传过来一个逗号分隔的字符串 `selectContactIds`（比如 "userA,userB"），代码将其拆分成数组。
+        
+- **获取我的好友列表**：
+    
+    - 查询数据库 `UserContact` 表，找出当前用户 (`tokenUserInfoDto.getUserId()`) 的所有状态为 **FRIEND (好友)** 的联系人。
+        
+    - 提取出这些好友的 ID 列表 `contactIdList`。
+        
+- **权限验证 (验证是不是好友)**：
+    
+    - 判断前端传来的 `contactIds` 是否都在我的好友列表 `contactIdList` 里。如果不包含，说明你在邀请陌生人或非好友，抛出异常。
+	
+- **获取当前会议信息**：
+    
+    - 根据用户当前的 `currentMeetingId` 查询会议详情 `MeetingInfo`。
+        
+- **循环处理邀请**：
+    
+    - **重复邀请检查**：去 Redis 查一下这个人是不是已经在会议里了。如果已经在里面且状态正常，就 `continue` 跳过，不重复骚扰。
+        
+    - **写入邀请记录**：调用 `redisComponent.addInviteInfo`，在 Redis 里记一笔“A 邀请了 B”。这通常用于 B 点击链接入会时的合法性校验。
+        
+    - **构建消息**：封装一个 `INVITE_MEMBER_MEETING` 类型的消息，包含会议名字、邀请人名字、会议 ID。
+        
+    - **发送消息**：通过 WebSocket/RabbitMQ 推送给被邀请人。
