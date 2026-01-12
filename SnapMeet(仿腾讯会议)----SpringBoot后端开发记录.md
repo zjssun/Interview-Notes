@@ -2076,3 +2076,25 @@ public void dealWithApply(String applyUserId, String userId, String nickName, In
 ```
 ### 联系人入会
 #### 接口
+```java
+//邀请加入会议  
+@RequestMapping("/inviteMember")  
+@GlobalInterceptor  
+public ResponseVO inviteMember(@NotEmpty String selectContactIds){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    meetingInfoService.inviteMember(tokenUserInfoDto,selectContactIds);  
+    return   getSuccessResponseVO(null);  
+}  
+  
+//接受加入会议  
+@RequestMapping("/acceptInvite")  
+@GlobalInterceptor  
+public ResponseVO acceptInvite(@NotEmpty String meetingId){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    meetingInfoService.acceptInvite(tokenUserInfoDto,meetingId);  
+    return   getSuccessResponseVO(null);  
+}
+```
+#### 服务函数
+##### 在会议中邀请好友加入
+
