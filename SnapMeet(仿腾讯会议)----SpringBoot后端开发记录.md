@@ -2174,3 +2174,36 @@ public void acceptInvite(TokenUserInfoDto tokenUserInfoDto, String meetingId) {
 ```
 ### 聊天
 #### ChatController.java
+```java
+//加载聊天内容
+@RequestMapping("/loadMessage")  
+@GlobalInterceptor  
+public ResponseVO loadMessage(Long maxMessageId,Integer pageNo){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    String meetingId = tokenUserInfoDto.getCurrentMeetingId();  
+    String tableName = TableSplitUtils.getMeetingChatMessageTable(meetingId);  
+    return getSuccessResponseVO(null);  
+}  
+//发送聊天内容
+@RequestMapping("/sendMessage")  
+@GlobalInterceptor  
+public ResponseVO sendMessage(String message,Integer messageType, String receiveUserId,String fileName,Long fileSize,Integer fileType){  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    MeetingChatMessage chatMessage = new MeetingChatMessage();  
+    chatMessage.setMessageType(messageType);  
+    chatMessage.setMessageContent(message);  
+    chatMessage.setFileSize(fileSize);  
+    chatMessage.setFileType(fileType);  
+    chatMessage.setSendUserId(tokenUserInfoDto.getUserId());  
+    chatMessage.setSendUserNickName(tokenUserInfoDto.getNickName());  
+    chatMessage.setMeetingId(tokenUserInfoDto.getCurrentMeetingId());  
+    if(Constants.ZERO_STR.equals(receiveUserId)){  
+        chatMessage.setReceiveType(ReceiveTypeEnum.ALL.getType());  
+    }else {  
+        chatMessage.setReceiveType(ReceiveTypeEnum.USER.getType());  
+    }  
+    chatMessage.setReceiveUserId(receiveUserId);  
+    meetingChatMessageService.saveChatMessage(chatMessage);  
+    return getSuccessResponseVO(null);  
+}
+```
