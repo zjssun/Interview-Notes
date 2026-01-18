@@ -2206,6 +2206,14 @@ public ResponseVO sendMessage(String message,Integer messageType, String receive
     meetingChatMessageService.saveChatMessage(chatMessage);  
     return getSuccessResponseVO(null);  
 }
+//发送文件
+@RequestMapping("/uploadFile")  
+@GlobalInterceptor  
+public ResponseVO uploadFile(MultipartFile file,Long messageId,Long sendTime) throws IOException {  
+    TokenUserInfoDto tokenUserInfoDto = getTokenUserInfoDto();  
+    meetingChatMessageService.uploadFile(file,tokenUserInfoDto.getCurrentMeetingId(),messageId,sendTime);  
+    return  getSuccessResponseVO(null);  
+}
 ```
 #### 发送聊天服务函数
 ```java
@@ -2249,5 +2257,50 @@ public void saveChatMessage(MeetingChatMessage chatMessage) {
         sendDto.setMessageSend2Type(MessageSend2TypeEnum.GROUP.getType());  
         messageHandler.sendMessage(sendDto);  
     }  
+}
+```
+#### 发送文件服务函数
+```java
+@Override  
+public void uploadFile(MultipartFile file,String meetingId, Long messageId, Long sendTime) throws IOException {  
+    LocalDate today = LocalDate.now();  
+    String time = today.toString();  
+    String folder = appConfig.getProjectFolder() + Constants.FILE_FOLDER_FILE + time;  
+    File folderFile = new File(folder);  
+    if(folderFile.exists()){  
+        folderFile.mkdirs();  
+    }  
+    String filePath = folder+"/"+messageId;  
+    String fileName = file.getOriginalFilename();  
+    String fileSuffix = StringTools.getFileSuffix(fileName);  
+    FileTypeEnum fileTypeEnum = FileTypeEnum.getBySuffix(fileSuffix);  
+    if(FileTypeEnum.IMAGE==fileTypeEnum){  
+        File tempFile = new File(appConfig.getProjectFolder() + Constants.FILE_FOLDER_TEMP+StringTools.getRandomString(30));  
+        file.transferTo(tempFile);  
+        filePath = filePath + Constants.IMAGE_SUFFIX;  
+        filePath = fmpegutils.transferImageType(tempFile,filePath);  
+        fmpegutils.createImageThumbnail(filePath);  
+    }else if(fileTypeEnum==FileTypeEnum.VIDEO){  
+        File tempFile = new File(appConfig.getProjectFolder() + Constants.FILE_FOLDER_TEMP+StringTools.getRandomString(30));  
+        file.transferTo(tempFile);  
+        filePath = filePath + Constants.VIDEO_SUFFIX;  
+        fmpegutils.transferVideoType(tempFile,filePath,fileSuffix);  
+        fmpegutils.createImageThumbnail(filePath);  
+    }else {  
+        filePath = filePath + fileSuffix;  
+        file.transferTo(new File(filePath));  
+    }  
+    String tableName = TableSplitUtils.getMeetingChatMessageTable(meetingId);  
+    MeetingChatMessage chatMessage = new MeetingChatMessage();  
+    chatMessage.setStatus(MessageStatusEnum.SENDED.getStatus());  
+    //TODO 更新数据  
+  
+    MessageSendDto sendDto = new MessageSendDto<>();  
+    sendDto.setMeetingId(meetingId);  
+    sendDto.setMessageType(MessageTypeEnum.CHAT_MEDIA_MESSAGE_UPDATE.getType());  
+    sendDto.setStatus(MessageStatusEnum.SENDED.getStatus());  
+    sendDto.setMessageId(messageId);  
+    sendDto.setMessageSend2Type(MessageSend2TypeEnum.GROUP.getType());  
+    messageHandler.sendMessage(sendDto);  
 }
 ```
