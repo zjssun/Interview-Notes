@@ -2207,3 +2207,47 @@ public ResponseVO sendMessage(String message,Integer messageType, String receive
     return getSuccessResponseVO(null);  
 }
 ```
+#### 发送聊天服务函数
+```java
+@Override  
+public void saveChatMessage(MeetingChatMessage chatMessage) {  
+    if(!ArrayUtils.contains(new Integer[]{MessageTypeEnum.CHAT_TEXT_MESSAGE.getType(),MessageTypeEnum.CHAT_MEDIA_MESSAGE.getType()},chatMessage.getMessageType())){  
+        throw new BusinessException(ResponseCodeEnum.CODE_600);  
+    }  
+    ReceiveTypeEnum receiveTypeEnum = ReceiveTypeEnum.getByStatus(chatMessage.getReceiveType());  
+    if(null == receiveTypeEnum){  
+        throw new BusinessException(ResponseCodeEnum.CODE_600);  
+    }  
+    if(receiveTypeEnum==ReceiveTypeEnum.USER&& StringTools.isEmpty(chatMessage.getReceiveUserId())){  
+        throw new BusinessException(ResponseCodeEnum.CODE_600);  
+    }  
+    MessageTypeEnum messageTypeEnum = MessageTypeEnum.getByType(chatMessage.getMessageType());  
+    if(messageTypeEnum==MessageTypeEnum.CHAT_TEXT_MESSAGE){  
+        if(StringTools.isEmpty(chatMessage.getMessageContent())){  
+            throw new BusinessException(ResponseCodeEnum.CODE_600);  
+        }  
+        chatMessage.setStatus(MessageStatusEnum.SENDED.getStatus());  
+    }else if(messageTypeEnum==MessageTypeEnum.CHAT_MEDIA_MESSAGE){  
+        if(StringTools.isEmpty(chatMessage.getFileName()) || chatMessage.getFileSize()==null||chatMessage.getFileType()==null){  
+            throw  new BusinessException(ResponseCodeEnum.CODE_600);  
+        }  
+        chatMessage.setFileSuffx(StringTools.getFileSuffix(chatMessage.getFileName()));  
+        chatMessage.setStatus(MessageStatusEnum.SENDING.getStatus());  
+    }  
+  
+    chatMessage.setSendTime(LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());  
+    chatMessage.setMessageId(SnowFlakeUtils.nextId());  
+    String tableName = TableSplitUtils.getMeetingChatMessageTable(chatMessage.getMeetingId());  
+    //TODO sql语句  
+    MessageSendDto sendDto = StringTools.copyProperties(chatMessage,MessageSendDto.class);  
+    if(ReceiveTypeEnum.USER == receiveTypeEnum){  
+        sendDto.setMessageSend2Type(MessageSend2TypeEnum.USER.getType());  
+        messageHandler.sendMessage(sendDto);  
+        sendDto.setReceiveUserId(chatMessage.getSendUserId());  
+        messageHandler.sendMessage(sendDto);  
+    }else {  
+        sendDto.setMessageSend2Type(MessageSend2TypeEnum.GROUP.getType());  
+        messageHandler.sendMessage(sendDto);  
+    }  
+}
+```
