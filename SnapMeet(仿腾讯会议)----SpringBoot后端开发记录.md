@@ -2172,4 +2172,5 @@ public void acceptInvite(TokenUserInfoDto tokenUserInfoDto, String meetingId) {
     redisComponent.saveTokenUserInfoDto(tokenUserInfoDto);  
 }
 ```
-### 
+### 聊天
+#### ChatController.java
