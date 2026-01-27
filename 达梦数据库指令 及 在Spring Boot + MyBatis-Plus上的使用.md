@@ -158,3 +158,13 @@ WHERE u.STATUS = 1;
 | **日期加减**   | `DATE_ADD(date, INTERVAL 1 DAY)`        | `date + 1` (直接加数字，单位为天)                           |
 
 ## Spring Boot
+### 添加依赖
+可以在这里查看最新版本👉[DmJdbcDriver18](https://mvnrepository.com/artifact/com.dameng/DmJdbcDriver18)
+```xml
+<!--   DM     -->  
+<dependency>  
+    <groupId>com.dameng</groupId>  
+    <artifactId>DmJdbcDriver18</artifactId>  
+    <version>8.1.3.140</version>  
+</dependency>  
+```
