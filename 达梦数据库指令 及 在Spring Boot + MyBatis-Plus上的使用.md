@@ -229,11 +229,25 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 ```java
 //接口
 public interface ISysUserService extends IService<SysUser> {  
+	PageDto<SysUser> getPage(PageQuery pageQuery);
 }
 //实现类
 @Service  
 public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {  
-  
+	@Override  
+	public PageDto<SysUser> getPage(PageQuery pageQuery) {  
+	    Page<SysUser> page = new Page<>(pageQuery.getCurrentPage(),pageQuery.getPageSize());  
+	    if(pageQuery.getOrderBy() != null && pageQuery.getAsc() != null){  
+	        OrderItem orderItem = pageQuery.getAsc() ? OrderItem.asc(pageQuery.getOrderBy()) : OrderItem.desc(pageQuery.getOrderBy());  
+	        page.addOrder(orderItem);  
+	    }  
+	    Page<SysUser> result = this.page(page);  
+	    PageDto<SysUser> pageDto = new PageDto<>();  
+	    pageDto.setTotal(result.getTotal());  
+	    pageDto.setSize(result.getSize());  
+	    pageDto.setRecords(result.getRecords());  
+	    return pageDto;  
+	}
 }
 ```
 **Controller 层 (SysUserController)**
@@ -251,9 +265,15 @@ public class SysUserController extends ABaseController{
         return getSuccessResponseVO(success);  
     }  
     
-    @RequestMapping("/list")  
-	public ResponseVO list(){  
-	    return getSuccessResponseVO(sysUserServiceImpl.list());  
+    @RequestMapping("/page")  
+	public ResponseVO getPage(Long currentPage, Long pageSize,String orderBy,Boolean asc){  
+	    PageQuery pageQuery = new PageQuery();  
+	    pageQuery.setCurrentPage(currentPage);  
+	    pageQuery.setPageSize(pageSize);  
+	    pageQuery.setOrderBy(orderBy);  
+	    pageQuery.setAsc(asc);  
+	    PageDto<SysUser> page = sysUserServiceImpl.getPage(pageQuery);  
+	    return getSuccessResponseVO(page);  
 	}
 	
 	
@@ -275,6 +295,7 @@ public class SysUserController extends ABaseController{
 在数据库中为
 ![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127112340206.png)
 #### 分页查询
+
 返回结果：
 ```json
 {
