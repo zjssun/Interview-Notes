@@ -230,6 +230,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 //接口
 public interface ISysUserService extends IService<SysUser> {  
 	PageDto<SysUser> getPage(PageQuery pageQuery);
+	Boolean updateStatus(Integer id, Integer status);
 }
 //实现类
 @Service  
@@ -276,7 +277,11 @@ public class SysUserController extends ABaseController{
 	    return getSuccessResponseVO(page);  
 	}
 	
-	
+	@RequestMapping("/status")
+	public ResponseVO updateStatus(Integer id, Integer status){  
+	    Boolean success = sysUserServiceImpl.updateStatus(id, status);  
+	    return getSuccessResponseVO(success);  
+	}
 }
 ```
 ### 运行测试
