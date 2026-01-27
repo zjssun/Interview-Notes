@@ -187,4 +187,72 @@ mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl
 mybatis-plus.configuration.map-underscore-to-camel-case=true  
 mybatis-plus.global-config.db-config.id-type=auto
 ```
+在MyBatis-Plus的分页插件中需要设置**数据库类型**(dbType)为`DbType.DM`
+```java
+@Configuration  
+public class MybatisPlusConfig {  
+    @Bean  
+    public MybatisPlusInterceptor mybatisPlusInterceptor() {  
+        MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();  
+  
+        // 添加分页拦截器，并指定数据库类型为 DM (达梦)  
+        interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.DM));  
+  
+        return interceptor;  
+    }  
+}
+```
+### 实体、Mapper、Service、Controller
+剩下的CRUD和Mysql的操作一样，就直接发代码了。
+**实体（SysUser）：**
+```java
+@Data  
+@EqualsAndHashCode(callSuper = false)  
+@Accessors(chain = true)  
+public class SysUser {  
+    @TableId(value = "id",type = IdType.AUTO)  
+    private Long id;  
+    @TableField("USERNAME")  
+    private String username;  
+    @TableField("CREATE_TIME")  
+    private Date createTime;  
+    @TableField("STATUS")  
+    private Integer status;  
+}
+```
+**Mapper 接口 (SysUserMapper):**
+```java
+public interface SysUserMapper extends BaseMapper<SysUser> {  
+}
+```
+**Service 层**
+```java
+//接口
+public interface ISysUserService extends IService<SysUser> {  
+}
+//实现类
+@Service  
+public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> implements ISysUserService {  
+  
+}
+```
+**Controller 层 (SysUserController)**
+```java
+@RestController  
+@RequestMapping("/user")  
+public class SysUserController extends ABaseController{  
+    @Resource  
+    private SysUserServiceImpl sysUserServiceImpl;  
+  
+    @RequestMapping("/add")  
+    public ResponseVO add(String username){  
+        Date createTime = new Date();  
+        boolean success = sysUserServiceImpl.save(new SysUser().setUsername(username).setCreateTime(createTime));  
+        return getSuccessResponseVO(success);  
+    }  
+}
+```
+### 运行测试
+#### 添加列
 
+![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127112034994.png)
