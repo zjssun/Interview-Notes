@@ -254,5 +254,16 @@ public class SysUserController extends ABaseController{
 ```
 ### 运行测试
 #### 添加列
-
 ![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127112034994.png)
+返回结果
+```json
+{
+    "status": "success",
+    "code": 200,
+    "info": "请求成功",
+    "data": true,
+    "time": "2026-1-27 11:08:56"
+}
+```
+在数据库中为
+![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127112340206.png)
