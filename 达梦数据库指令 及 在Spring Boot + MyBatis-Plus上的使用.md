@@ -324,4 +324,4 @@ public class SysUserController extends ABaseController{
     }
 }
 ```
-#### 
+#### 修改用户状态(Update)
