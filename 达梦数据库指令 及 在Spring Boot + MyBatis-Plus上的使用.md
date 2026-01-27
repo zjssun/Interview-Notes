@@ -295,7 +295,8 @@ public class SysUserController extends ABaseController{
 在数据库中为
 ![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127112340206.png)
 #### 分页查询
-
+查询第1页，每页显示5条数据，根据`CREATE_TIME` 排序，降序排列。
+![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127135110997.png)
 返回结果：
 ```json
 {
