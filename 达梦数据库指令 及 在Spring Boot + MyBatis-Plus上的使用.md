@@ -250,12 +250,19 @@ public class SysUserController extends ABaseController{
         boolean success = sysUserServiceImpl.save(new SysUser().setUsername(username).setCreateTime(createTime));  
         return getSuccessResponseVO(success);  
     }  
+    
+    @RequestMapping("/list")  
+	public ResponseVO list(){  
+	    return getSuccessResponseVO(sysUserServiceImpl.list());  
+	}
+	
+	
 }
 ```
 ### 运行测试
 #### 添加列
 ![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127112034994.png)
-返回结果
+返回结果：
 ```json
 {
     "status": "success",
@@ -267,3 +274,26 @@ public class SysUserController extends ABaseController{
 ```
 在数据库中为
 ![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127112340206.png)
+#### 获取全部
+返回结果：
+```json
+{
+    "status": "success",
+    "code": 200,
+    "info": "请求成功",
+    "data": [
+        {
+            "id": 1,
+            "username": "炎彬",
+            "createTime": "2026-01-27T02:47:27.809+00:00",
+            "status": 1
+        },
+        {
+            "id": 2,
+            "username": "绍辉",
+            "createTime": "2026-01-27T03:08:55.850+00:00",
+            "status": 1
+        },
+    ]
+}
+```
