@@ -158,7 +158,7 @@ WHERE u.STATUS = 1;
 | **日期加减**   | `DATE_ADD(date, INTERVAL 1 DAY)`        | `date + 1` (直接加数字，单位为天)                           |
 
 ## Spring Boot
-### 添加依赖
+### 添加依赖  和 配置
 可以在这里查看最新版本👉[DmJdbcDriver18](https://mvnrepository.com/artifact/com.dameng/DmJdbcDriver18)
 ```xml
 <!--   DM     -->  
@@ -168,3 +168,23 @@ WHERE u.STATUS = 1;
     <version>8.1.3.140</version>  
 </dependency>  
 ```
+在application.properties中配置达梦和MyBatis-Plus 
+```properties
+spring.datasource.driver-class-name=dm.jdbc.driver.DmDriver  
+spring.datasource.url=jdbc:dm://localhost:5236/SYSDBA?zeroDateTimeBehavior=convertToNull&useUnicode=true&characterEncoding=utf-8  
+spring.datasource.hikari.username=SYSDBA  
+spring.datasource.hikari.password=Dm123456  
+spring.datasource.hikari.pool-name=HikariCPDatasource  
+spring.datasource.hikari.minimum-idle=5  
+spring.datasource.hikari.idle-timeout=180000  
+spring.datasource.hikari.maximum-pool-size=10  
+spring.datasource.hikari.auto-commit=true  
+spring.datasource.hikari.max-lifetime=1800000  
+spring.datasource.hikari.connection-timeout=30000  
+spring.datasource.hikari.connection-test-query=SELECT 1
+
+mybatis-plus.configuration.log-impl=org.apache.ibatis.logging.stdout.StdOutImpl  
+mybatis-plus.configuration.map-underscore-to-camel-case=true  
+mybatis-plus.global-config.db-config.id-type=auto
+```
+
