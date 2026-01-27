@@ -149,7 +149,6 @@ LEFT JOIN SYS_DEPT d ON u.DEPT_ID = d.ID
 WHERE u.STATUS = 1;
 ```
 
----
 ## 日期处理 (常用函数对比)
 | **功能**     | **MySQL**                               | **达梦**                                            |
 | ---------- | --------------------------------------- | ------------------------------------------------- |
@@ -157,3 +156,5 @@ WHERE u.STATUS = 1;
 | **字符串转日期** | `STR_TO_DATE('2026-01-01', '%Y-%m-%d')` | `TO_DATE('2026-01-01', 'YYYY-MM-DD')` (Oracle 风格) |
 | **日期转字符串** | `DATE_FORMAT(date, '%Y-%m-%d')`         | `TO_CHAR(date, 'YYYY-MM-DD')`                     |
 | **日期加减**   | `DATE_ADD(date, INTERVAL 1 DAY)`        | `date + 1` (直接加数字，单位为天)                           |
+
+## Spring Boot
