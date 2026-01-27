@@ -243,7 +243,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	    }  
 	    Page<SysUser> result = this.page(page);  
 	    PageDto<SysUser> pageDto = new PageDto<>();  
-	    pageDto.setTotal(result.getTotal());  
+	    pageDto.setTotalPages(result.getPages());  
 	    pageDto.setSize(result.getSize());  
 	    pageDto.setRecords(result.getRecords());  
 	    return pageDto;  
