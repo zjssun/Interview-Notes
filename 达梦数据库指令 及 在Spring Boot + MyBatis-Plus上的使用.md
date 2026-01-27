@@ -230,7 +230,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 //接口
 public interface ISysUserService extends IService<SysUser> {  
 	PageDto<SysUser> getPage(PageQuery pageQuery);
-	Boolean updateStatus(Integer id, Integer status);
+	Boolean updateStatus(Integer id, Integer status,String username);
 }
 //实现类
 @Service  
@@ -248,6 +248,19 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	    pageDto.setSize(result.getSize());  
 	    pageDto.setRecords(result.getRecords());  
 	    return pageDto;  
+	}
+	@Override  
+	public Boolean updateStatus(Integer id, Integer status,String username) {  
+	    if (id == null && !StringUtils.hasText(username)) {  
+	        throw new BusinessException("参数缺失");  
+	    }  
+	    SysUser sysUser = new SysUser();  
+	    sysUser.setStatus(status);  
+	    LambdaUpdateWrapper<SysUser> updateWrapper = new LambdaUpdateWrapper<>();  
+	    boolean hasUsername = StringUtils.hasText(username);  
+	    updateWrapper.eq(hasUsername,SysUser::getUsername, username);  
+	    updateWrapper.eq(!hasUsername,SysUser::getId, id);  
+	    return this.update(sysUser,updateWrapper);  
 	}
 }
 ```
@@ -277,9 +290,9 @@ public class SysUserController extends ABaseController{
 	    return getSuccessResponseVO(page);  
 	}
 	
-	@RequestMapping("/status")
-	public ResponseVO updateStatus(Integer id, Integer status){  
-	    Boolean success = sysUserServiceImpl.updateStatus(id, status);  
+	@RequestMapping("/status")  
+	public ResponseVO updateStatus(Integer id, Integer status,String username){  
+	    Boolean success = sysUserServiceImpl.updateStatus(id, status,username);  
 	    return getSuccessResponseVO(success);  
 	}
 }
@@ -330,3 +343,10 @@ public class SysUserController extends ABaseController{
 }
 ```
 #### 修改用户状态(Update)
+可以通过 id 或 用户名 来修改status值。
+![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127145625340.png)
+结果：
+![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127145642246.png)
+#### 删除数据
+可以通过 id 或 用户名 来删除数据。
+
