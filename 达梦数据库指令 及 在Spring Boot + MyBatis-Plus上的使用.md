@@ -231,6 +231,7 @@ public interface SysUserMapper extends BaseMapper<SysUser> {
 public interface ISysUserService extends IService<SysUser> {  
 	PageDto<SysUser> getPage(PageQuery pageQuery);
 	Boolean updateStatus(Integer id, Integer status,String username);
+	Boolean delete(Integer id, String username);
 }
 //实现类
 @Service  
@@ -261,6 +262,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 	    updateWrapper.eq(hasUsername,SysUser::getUsername, username);  
 	    updateWrapper.eq(!hasUsername,SysUser::getId, id);  
 	    return this.update(sysUser,updateWrapper);  
+	}
+	@Override  
+	public Boolean delete(Integer id, String username) {  
+		if(id == null && !StringUtils.hasText(username)){  
+			throw new BusinessException("参数缺失");  
+		}  
+		LambdaUpdateWrapper<SysUser> deleteWrapper = new LambdaUpdateWrapper<>();  
+		boolean hasUsername = StringUtils.hasText(username);  
+		deleteWrapper.eq(hasUsername,SysUser::getUsername,username)  
+				.eq(!hasUsername,SysUser::getId, id);  
+		return this.remove(deleteWrapper);  
 	}
 }
 ```
@@ -295,6 +307,7 @@ public class SysUserController extends ABaseController{
 	    Boolean success = sysUserServiceImpl.updateStatus(id, status,username);  
 	    return getSuccessResponseVO(success);  
 	}
+	
 }
 ```
 ### 运行测试
@@ -349,4 +362,4 @@ public class SysUserController extends ABaseController{
 ![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127145642246.png)
 #### 删除数据
 可以通过 id 或 用户名 来删除数据。
-
+![](assets/达梦数据库指令%20及%20在Spring%20Boot%20+%20MyBatis-Plus上的使用/file-20260127150502328.png)
