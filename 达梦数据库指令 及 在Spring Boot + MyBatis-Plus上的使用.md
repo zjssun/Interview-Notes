@@ -303,19 +303,24 @@ public class SysUserController extends ABaseController{
     "status": "success",
     "code": 200,
     "info": "请求成功",
-    "data": [
-        {
-            "id": 1,
-            "username": "炎彬",
-            "createTime": "2026-01-27T02:47:27.809+00:00",
-            "status": 1
-        },
-        {
-            "id": 2,
-            "username": "绍辉",
-            "createTime": "2026-01-27T03:08:55.850+00:00",
-            "status": 1
-        },
-    ]
+    "data": {
+        "totalPages": 3,
+        "size": 5,
+        "records": [
+            {
+                "id": 12,
+                "username": "诗雨",
+                "createTime": "2026-01-27T13:12:51.868",
+                "status": 1
+            },
+            {
+                "id": 11,
+                "username": "荣轩",
+                "createTime": "2026-01-27T13:12:51.258",
+                "status": 1
+            },
+            省略3条...
+        ]
+    }
 }
 ```
