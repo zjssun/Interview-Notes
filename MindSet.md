@@ -37,3 +37,15 @@ CREATE TABLE `sys_user` (
   KEY `idx_status` (`status`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1006 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统用户表';
 ```
+
+
+DDD框架层级关系
+在你的项目里，层级关系是这样的（从上到下）：
+
+1. **Trigger (服务员)** —— 最外层，接触用户。
+    
+2. **App (厨师长)** —— 中间层，负责指挥。
+    
+3. **Domain (菜谱/核心)** —— 最内层，核心逻辑。
+    
+4. **Infrastructure (冰箱/仓库)** —— 基础支撑。
