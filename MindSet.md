@@ -1,7 +1,7 @@
 Controller 写在 digital_system-trigger/src/main/java/cn/qizheng/digital/trigger/http
-DTO 写在 digital_system-api/src/main/java/cn/qizheng/digital/api/dto
+DTO、vo、Cmd 写在 digital_system-api/src/main/java/cn/qizheng/digital/api/dto
 SQL Mapper / DAO / Impl 写在 digital_system-infrastructure
-接口 Mapper digital_system-domain/src/main/java/cn/qizheng/digital/domain/user/adapter/repository
+接口 Mapper 写在 digital_system-domain/src/main/java/cn/qizheng/digital/domain/
 Service 写在 digital_system-app/src/main/java/cn/qizheng/digital/service/
 
 
