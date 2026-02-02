@@ -3,6 +3,7 @@
 - 框架：Spring Boot
 - 数据库：MySQL + 原生 MyBatis (非 MyBatis-Plus)
 - 缓存：Redis
+- 工具包：hot
 
 ### 2. 模块结构与职责 (Module Structure)
 我的项目名为 `digital_system`，包含以下模块：
