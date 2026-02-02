@@ -1,43 +1,56 @@
-DTO、vo、Cmd 写在 digital_system-api/src/main/java/cn/qizheng/digital/api/dto
+你好，我正在开发一个基于 Java Spring Boot 的多模块项目，采用 COLA (DDD) 架构。
+请记住我的项目结构和依赖规则，后续的代码生成和问题解答请严格遵循此规范：
 
-SQL Mapper 写在 digital_system-infrastructure/src/main/java/cn/qizheng/digital/infrastructure/dao/mapper
-PO 写在 digital_system-infrastructure/src/main/java/cn/qizheng/digital/infrastructure/dao/po
+### 1. 技术栈
+- 语言：Java 17+
+- 框架：Spring Boot
+- 数据库：MySQL + 原生 MyBatis (非 MyBatis-Plus)
+- 缓存：Redis
 
-Entity 写在 digital_system-domain/src/main/java/cn/qizheng/digital/domain/
-Gateway接口 写在 digital_system-domain/src/main/java/cn/qizheng/digital/domain/
-Gateway实现 写在 digital_system-infrastructure/src/main/java/cn/qizheng/digital/infrastructure/adapter/repository
+### 2. 模块结构与职责 (Module Structure)
+我的项目名为 `digital_system`，包含以下模块：
 
-Service 写在 digital_system-app/src/main/java/cn/qizheng/digital/service/
+- **digital_system-types (公共层)**
+  - 职责：存放枚举 (Enums)、通用异常 (AppException)、通用响应 (Response)、全链路共享对象。
+  - 特殊规则：`LoginUserDTO` 放在这里，以便 Domain 和 Infra 层都能访问。
 
-Controller 写在 digital_system-trigger/src/main/java/cn/qizheng/digital/trigger/http
+- **digital_system-domain (领域层/核心)**
+  - 职责：核心业务逻辑。不依赖 API、App 或 Infra。
+  - 内容：
+    - `model/entity`: 领域实体 (如 `UserEntity`)，包含核心逻辑 (如 `checkPassword`)。
+    - `adapter/repository`: 接口定义 (如 `UserGateway`)。
+    - `service`: 领域服务 (如 `UserAuthDomainService`)，负责业务编排。
 
+- **digital_system-api (接口定义层)**
+  - 职责：定义前端交互契约。
+  - 内容：`dto` (如 `UserLoginCmd`), `vo` (如 `LoginDataVO`)。
 
-用户表
-```sql
-CREATE TABLE `sys_user` (
-  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-  `username` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '用户名(账号登录用)',
-  `password` varchar(128) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '加密后的密码',
-  `salt` varchar(32) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '加密盐',
-  `mobile` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '手机号(手机登录用)',
-  `email` varchar(128) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '邮箱(找回密码用)',
-  `real_name` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '真实姓名',
-  `position` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '岗位',
-  `user_type` tinyint NOT NULL DEFAULT '3' COMMENT '用户类型(1:Super, 2:Admin, 3:User)',
-  `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT '状态(1:启用 0:禁用)',
-  `employee_id` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT '关联的员工ID(用于身份绑定)',
-  `dept_id` bigint DEFAULT NULL COMMENT '部门ID(冗余字段，方便查询)',
-  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  `is_deleted` tinyint(1) DEFAULT '0' COMMENT '逻辑删除(0:未删 1:已删)',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uk_username` (`username`),
-  UNIQUE KEY `uk_mobile` (`mobile`),
-  UNIQUE KEY `uk_email` (`email`),
-  KEY `idx_status` (`status`)
-) ENGINE=InnoDB AUTO_INCREMENT=1006 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='系统用户表';
-```
+- **digital_system-infrastructure (基础设施层)**
+  - 职责：实现技术细节。
+  - 内容：
+    - `dao/po`: 数据库对象 (如 `UserPO`)。
+    - `dao`: MyBatis Mapper 接口。
+    - `adapter/repository`: 实现 Domain 层的接口 (如 `UserGatewayImpl`)。
+    - `utils`: Redis 工具类。
+  - 特殊规则：MyBatis XML 文件必须非空，且路径配置正确。
 
+- **digital_system-trigger (触发器/Web层)**
+  - 职责：接收 HTTP 请求，解析参数。
+  - 内容：Controller (如 `AuthController`)。
+  - 依赖：调用 `domain` 层的 Service，使用 `api` 层的 DTO。
 
+- **digital_system-app (启动层)**
+  - 职责：Spring Boot 启动类 (`Application.java`)，全局配置 (`application.yml`)。
+  - 依赖：聚合所有模块，是项目的入口。
 
-Prompt:
+### 3. 关键依赖规则 (Dependency Rules)
+必须遵守单向依赖，防止循环引用：
+App -> Trigger -> Domain <- Infrastructure
+(所有层都可以依赖 Types)
+
+### 4. 这里的开发习惯
+- **Entity vs PO vs DTO**：严禁混用。Controller 负责将 DTO 转为 Entity 传给 Domain；Infra 负责将 Entity 转为 PO 存库。
+- **MyBatis**：使用 XML 编写 SQL，XML 文件不能为空。
+- **启动扫描**：启动类使用了 `@ComponentScan("cn.qizheng.digital")` 以确保扫描到所有模块。
+
+如果理解了，请回复“项目结构已加载”，然后等待我的具体问题。
