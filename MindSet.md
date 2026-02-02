@@ -1,13 +1,15 @@
-Controller 写在 digital_system-trigger/src/main/java/cn/qizheng/digital/trigger/http
 DTO、vo、Cmd 写在 digital_system-api/src/main/java/cn/qizheng/digital/api/dto
 
 SQL Mapper / DAO / Impl 写在 digital_system-infrastructure/src/main/java/cn/qizheng/digital/infrastructure/dao/mapper
 PO 写在 digital_system-infrastructure/src/main/java/cn/qizheng/digital/infrastructure/dao/po
 
-接口 写在 digital_system-domain/src/main/java/cn/qizheng/digital/domain/
-
+Entity 写在 digital_system-domain/src/main/java/cn/qizheng/digital/domain/
+Gateway接口 写在 digital_system-domain/src/main/java/cn/qizheng/digital/domain/
+Gateway实现 写在 digital_system-infrastructure/src/main/java/cn/qizheng/digital/infrastructure/adapter/repository
 
 Service 写在 digital_system-app/src/main/java/cn/qizheng/digital/service/
+
+Controller 写在 digital_system-trigger/src/main/java/cn/qizheng/digital/trigger/http
 
 
 用户表
