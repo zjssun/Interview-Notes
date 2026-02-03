@@ -52,3 +52,13 @@ App -> Trigger -> Domain <- Infrastructure
 - **启动扫描**：启动类使用了 `@ComponentScan("cn.qizheng.digital")` 以确保扫描到所有模块。
 
 如果理解了，请回复“项目结构已加载”，然后等待我的具体问题。
+
+
+
+写一个登出接口，清除redis中的token数据
+这是我的RedisComponent
+// 保存登录用户信息
+public void saveLoginUserDTO(Map<String, Object> user, String token){
+    redisUtil.setex(Constants.REDIS_KEY_PREFIX_LOGIN_USER+token,user, Constants.REDIS_KEY_EXPIRES_ONE_HOUR);
+    redisUtil.setex(Constants.REDIS_KEY_PREFIX_LOGIN_USER+user.get("userId"),user, Constants.REDIS_KEY_EXPIRES_ONE_HOUR);
+}
